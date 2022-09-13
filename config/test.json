@@ -1,0 +1,11 @@
+{
+	"database": {
+		"DBUSER": "postgres",
+		"DBPASS": "sisifos",
+		"DBHOST": "localhost",
+		"DBPORT": 5432,
+		"DBNAME": "school-test",
+		"dialect": "postgres",
+		"logging": "false"
+	}
+}

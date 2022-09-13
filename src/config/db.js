@@ -1,7 +1,10 @@
 const Sequelize = require("sequelize");
+const config = require("config");
+
+const dbConfig = config.get("database");
 
 const sequelize = new Sequelize(
-	"postgres://postgres:sisifos@localhost:5432/school",
+	`postgres://${dbConfig.DBUSER}:${dbConfig.DBPASS}@${dbConfig.DBHOST}:${dbConfig.DBPORT}/${dbConfig.DBNAME}`,
 	{ dialect: "postgres", logging: false }
 );
 
