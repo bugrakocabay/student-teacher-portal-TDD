@@ -2,13 +2,42 @@ const request = require("supertest");
 const app = require("../src/app");
 const User = require("../src/Models/UserModel");
 const sequelize = require("../src/config/db");
+const SMTPServer = require("smtp-server").SMTPServer;
 
-beforeAll(() => {
-	return sequelize.sync();
+let lastMail, server;
+let simulateSmtpFailure = false;
+
+beforeAll(async () => {
+	server = new SMTPServer({
+		authOptional: true,
+		onData(stream, session, callback) {
+			let mailBody;
+			stream.on("data", (data) => {
+				mailBody += data.toString();
+			});
+			stream.on("end", () => {
+				if (simulateSmtpFailure) {
+					const err = new Error("Invalid mailbox");
+					err.responseCode = 533;
+					return callback(err);
+				}
+				lastMail = mailBody;
+				callback();
+			});
+		},
+	});
+
+	await server.listen(8587, "localhost");
+	await sequelize.sync();
 });
 
 beforeEach(() => {
+	simulateSmtpFailure = false;
 	return User.destroy({ truncate: true });
+});
+
+afterAll(async () => {
+	await server.close();
 });
 
 const postUser = (user = validUser) => {
@@ -85,5 +114,65 @@ describe("User Registration", () => {
 		const response = await postUser();
 
 		expect(response.body.message).toBe("email is already taken");
+	});
+
+	it("creates user in inactive mode", async () => {
+		await postUser();
+
+		const users = await User.findAll();
+		const savedUser = users[0];
+		expect(savedUser.inactive).toBe(true);
+	});
+
+	it("creates user in inactive mode even the request body contains inactive false", async () => {
+		const newUswer = { ...validUser, inactive: false };
+
+		await postUser(newUswer);
+
+		const users = await User.findAll();
+		const savedUser = users[0];
+		expect(savedUser.inactive).toBe(true);
+	});
+
+	it("creates an activation token for user", async () => {
+		await postUser();
+
+		const users = await User.findAll();
+		const savedUser = users[0];
+		expect(savedUser.activationToken).toBeTruthy();
+	});
+
+	it("sends an activation mail with token", async () => {
+		await postUser();
+
+		const users = await User.findAll();
+		const savedUser = users[0];
+		expect(lastMail).toContain("user1@mail.com");
+		expect(lastMail).toContain(savedUser.activationToken);
+	});
+
+	it("returns 502 Bad Gateway when sending email fails", async () => {
+		simulateSmtpFailure = true;
+		// const mockSendActivation = jest
+		// 	.spyOn(emailService, "sendAccountActivation")
+		// 	.mockRejectedValue({ message: "Failed to deliver email" });
+		const response = await postUser();
+		expect(response.status).toBe(502);
+		//mockSendActivation.mockRestore();
+	});
+
+	it("returns Email failure message when sending email fails", async () => {
+		simulateSmtpFailure = true;
+		const response = await postUser();
+		expect(response.body.message).toBe("email failure");
+	});
+
+	it("does not save user to db if activation email fails", async () => {
+		simulateSmtpFailure = true;
+
+		await postUser();
+
+		const users = await User.findAll();
+		expect(users.length).toBe(0);
 	});
 });

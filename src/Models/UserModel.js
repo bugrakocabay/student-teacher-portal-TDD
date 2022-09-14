@@ -50,10 +50,17 @@ User.init(
 				},
 			},
 		},
+		inactive: {
+			type: Sequelize.BOOLEAN,
+			defaultValue: true,
+		},
+		activationToken: {
+			type: Sequelize.STRING,
+		},
 	},
 	{ sequelize, modelName: "user" }
 );
 
-sequelize.sync({ force: true });
+sequelize.sync();
 
 module.exports = User;
