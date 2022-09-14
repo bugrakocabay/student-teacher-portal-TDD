@@ -7,6 +7,20 @@ const generateToken = (length) => {
 	return crypto.randomBytes(length).toString("hex").substring(0, length);
 };
 
+function InvalidTokenException() {
+	this.message = "";
+}
+
+const activate = async (token) => {
+	const user = await User.findOne({ where: { activationToken: token } });
+	if (!user) {
+		throw new InvalidTokenException();
+	}
+	user.inactive = false;
+	user.activationToken = null;
+	await user.save();
+};
+
 exports.createUser = async (req, res) => {
 	try {
 		const { firstname, lastname, email, password } = req.body;
@@ -43,6 +57,21 @@ exports.createUser = async (req, res) => {
 	} catch (error) {
 		console.log(error);
 		return res.status(502).send({ status: "fail", message: "email failure" });
+	}
+};
+
+exports.activateAccount = async (req, res) => {
+	const token = req.params.token;
+	try {
+		await activate(token);
+		return res
+			.status(200)
+			.send({ status: "success", message: "account activated" });
+	} catch (error) {
+		return res.status(400).send({
+			status: "fail",
+			message: "account is either active or the token is invalid",
+		});
 	}
 };
 

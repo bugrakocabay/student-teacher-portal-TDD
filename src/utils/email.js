@@ -1,21 +1,26 @@
 const nodemailer = require("nodemailer");
-//const nodemailerStub = require("nodemailer-stub");
+const config = require("config");
+const mailConfig = config.get("mail");
 
-const transporter = nodemailer.createTransport({
-	host: "localhost",
-	port: 8587,
-	tls: {
-		rejectUnauthorized: false,
-	},
-});
+const transporter = nodemailer.createTransport({ ...mailConfig });
 
 const sendAccountActivation = async (email, token) => {
-	await transporter.sendMail({
+	const info = await transporter.sendMail({
 		from: "My app <info@mail.com>",
 		to: email,
 		subject: "Account activation",
-		html: `Your activation token is ${token}`,
+		html: `
+		<div>
+			<b>Please click below to activate your account</b>
+		</div>	
+		<div>
+			<a href="http://localhost:3000/users/token/${token}"> Activate</a>
+		</div>`,
 	});
+
+	if (process.env.NODE_ENV === "development") {
+		console.log(`url: ${nodemailer.getTestMessageUrl(info)}`);
+	}
 };
 
 module.exports = { sendAccountActivation };
