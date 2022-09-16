@@ -81,3 +81,24 @@ exports.getSingleUser = async (req, res, next) => {
 		next(error);
 	}
 };
+
+exports.updateUser = async (req, res, next) => {
+	const authorization = req.headers.authorization;
+	if (authorization) {
+		const encoded = authorization.substring(6); // get encoded from auth header
+		const decoded = Buffer.from(encoded, "base64").toString("ascii"); // decode it
+		const [email, password] = decoded.split(":"); // destructure it
+		const user = await User.findOne({ where: { email: email } }); // find user in db
+
+		if (!user) return next(new AppError("User not found", 403));
+		if (user.id != req.params.id)
+			return next(new AppError("Unauthorized", 403));
+		if (user.inactive) return next(new AppError("Unauthorized", 403));
+
+		const match = await bcrypt.compare(password, user.password);
+		if (!match) return next(new AppError("Unauthorized", 403));
+
+		return res.send();
+	}
+	return res.status(403).send({ status: "fail", message: "Unauthorized" });
+};
