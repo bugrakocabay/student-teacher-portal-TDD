@@ -29,15 +29,17 @@ beforeAll(async () => {
 
 	await server.listen(8587, "localhost");
 	await sequelize.sync();
+	jest.setTimeout(20000);
 });
 
-beforeEach(() => {
+beforeEach(async () => {
 	simulateSmtpFailure = false;
-	return User.destroy({ truncate: true });
+	await User.destroy({ truncate: true });
 });
 
 afterAll(async () => {
 	await server.close();
+	jest.setTimeout(5000);
 });
 
 const postUser = (user = validUser) => {
@@ -47,7 +49,7 @@ const postUser = (user = validUser) => {
 const validUser = {
 	firstname: "osman",
 	lastname: "baba",
-	email: "user1@mail.com",
+	email: "user11@mail.com",
 	password: "P4ssword",
 };
 
@@ -76,7 +78,7 @@ describe("User Registration", () => {
 		const savedUser = userList[0];
 		expect(savedUser.firstname).toBe("osman");
 		expect(savedUser.lastname).toBe("baba");
-		expect(savedUser.email).toBe("user1@mail.com");
+		expect(savedUser.email).toBe("user11@mail.com");
 	});
 
 	it("hashes the password in database", async () => {
@@ -99,7 +101,7 @@ describe("User Registration", () => {
 			const user = {
 				firstname: "osman",
 				lastname: "baba",
-				email: "user1@mail.com",
+				email: "user11@mail.com",
 				password: "P4ssword",
 			};
 			user[field] = null;
@@ -147,7 +149,7 @@ describe("User Registration", () => {
 
 		const users = await User.findAll();
 		const savedUser = users[0];
-		expect(lastMail).toContain("user1@mail.com");
+		expect(lastMail).toContain("user11@mail.com");
 		expect(lastMail).toContain(savedUser.activationToken);
 	});
 
@@ -180,13 +182,13 @@ describe("User Registration", () => {
 describe("Account Activation", () => {
 	it("activates the account when correct token is sent", async () => {
 		await postUser();
+
 		let users = await User.findAll();
-		const token = users[0].activationToken;
+		let token = users[0].activationToken;
 
 		await request(app)
 			.post("/users/token/" + token)
 			.send();
-
 		users = await User.findAll();
 		expect(users[0].inactive).toBe(false);
 	});

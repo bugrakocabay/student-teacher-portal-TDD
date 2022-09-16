@@ -1,5 +1,6 @@
 const Sequelize = require("sequelize");
 const sequelize = require("../config/db");
+const Class = require("./ClassModel");
 
 const Model = Sequelize.Model;
 
@@ -7,6 +8,12 @@ class User extends Model {}
 
 User.init(
 	{
+		id: {
+			type: Sequelize.INTEGER,
+			allowNull: false,
+			autoIncrement: true,
+			primaryKey: true,
+		},
 		firstname: {
 			type: Sequelize.STRING,
 			allowNull: false,
@@ -58,8 +65,13 @@ User.init(
 			type: Sequelize.STRING,
 		},
 	},
-	{ sequelize, modelName: "user" }
+	{ sequelize, modelName: "user", timestamps: true }
 );
+
+User.hasMany(Class);
+Class.belongsTo(User, {
+	foreignKey: "userId",
+});
 
 sequelize.sync();
 
