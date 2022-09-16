@@ -82,23 +82,27 @@ exports.getSingleUser = async (req, res, next) => {
 	}
 };
 
+/*
+	Get the authenticated user from request, which was done in authentication part.
+	Unless it is authenticated or the ids don't match with request parameter's, 
+	send 403 error. If it is, get the user in db, and make changes on it, then save.
+*/
 exports.updateUser = async (req, res, next) => {
-	const authorization = req.headers.authorization;
-	if (authorization) {
-		const encoded = authorization.substring(6); // get encoded from auth header
-		const decoded = Buffer.from(encoded, "base64").toString("ascii"); // decode it
-		const [email, password] = decoded.split(":"); // destructure it
-		const user = await User.findOne({ where: { email: email } }); // find user in db
+	const authenticatedUser = req.authenticatedUser;
+	const { firstname, lastname, email } = req.body;
 
-		if (!user) return next(new AppError("User not found", 403));
-		if (user.id != req.params.id)
+	try {
+		if (!authenticatedUser || authenticatedUser.id != req.params.id) {
 			return next(new AppError("Unauthorized", 403));
-		if (user.inactive) return next(new AppError("Unauthorized", 403));
-
-		const match = await bcrypt.compare(password, user.password);
-		if (!match) return next(new AppError("Unauthorized", 403));
-
+		}
+		const user = await User.findOne({
+			where: { email: authenticatedUser.email },
+		}); // find user in db
+		user.firstname = firstname;
+		await user.save();
 		return res.send();
+	} catch (error) {
+		console.log(error);
+		next(error);
 	}
-	return res.status(403).send({ status: "fail", message: "Unauthorized" });
 };

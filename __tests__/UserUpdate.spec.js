@@ -58,7 +58,7 @@ describe("User Update", () => {
 		expect(response.statusCode).toBe(403);
 	});
 
-	it("returns 200 OK when user update is successfull", async () => {
+	it("returns 200 OK when user update is successful", async () => {
 		const savedUser = await addUser();
 		const update = { firstname: "cemsit" };
 
@@ -66,5 +66,16 @@ describe("User Update", () => {
 			auth: { email: savedUser.email, password: "verystr0ngpass" },
 		});
 		expect(response.statusCode).toBe(200);
+	});
+
+	it("updates firstname in database with valid authorization", async () => {
+		const savedUser = await addUser();
+		const update = { firstname: "cemsit" };
+		await putUser(savedUser.id, update, {
+			auth: { email: savedUser.email, password: "verystr0ngpass" },
+		});
+
+		const dbUser = await User.findOne({ where: { id: savedUser.id } });
+		expect(dbUser.firstname).toBe(update.firstname);
 	});
 });
