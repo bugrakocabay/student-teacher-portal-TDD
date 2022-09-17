@@ -1,13 +1,8 @@
 const User = require("../Models/UserModel");
 const bcrypt = require("bcryptjs");
-const crypto = require("crypto");
 const emailService = require("../utils/email");
 const AppError = require("../utils/appError");
-
-const generateToken = (length) => {
-	// generate activation token
-	return crypto.randomBytes(length).toString("hex").substring(0, length);
-};
+const { randomString } = require("../utils/generator");
 
 exports.createUser = async (req, res, next) => {
 	try {
@@ -22,7 +17,7 @@ exports.createUser = async (req, res, next) => {
 			lastname,
 			email,
 			password: hashedpassword,
-			activationToken: generateToken(16),
+			activationToken: randomString(16),
 		};
 		await emailService.sendAccountActivation(email, user.activationToken);
 
@@ -96,13 +91,13 @@ exports.updateUser = async (req, res, next) => {
 			return next(new AppError("Unauthorized", 403));
 		}
 		const user = await User.findOne({
-			where: { email: authenticatedUser.email },
+			where: { id: authenticatedUser.id },
 		}); // find user in db
 		user.firstname = firstname;
 		await user.save();
 		return res.send();
 	} catch (error) {
-		console.log(error);
+		console.log(`UPDATE USER ERROR ${error}`);
 		next(error);
 	}
 };

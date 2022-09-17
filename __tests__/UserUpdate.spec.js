@@ -13,12 +13,22 @@ beforeEach(async () => {
 });
 
 const putUser = async (id = 5, body = null, options = {}) => {
-	const agent = request(app).put("/users/" + id);
-
+	let agent = request(app);
+	let token;
 	if (options.auth) {
-		const { email, password } = options.auth;
-		agent.auth(email, password);
+		const response = await agent.post("/users/login").send(options.auth);
+		token = response.body.token;
 	}
+
+	agent = request(app).put("/users/" + id);
+
+	if (token) {
+		agent.set("Authorization", `Bearer ${token}`);
+	}
+	if (options.token) {
+		agent.set("Authorization", `Bearer ${options.token}`);
+	}
+
 	return agent.send(body);
 };
 
@@ -77,5 +87,10 @@ describe("User Update", () => {
 
 		const dbUser = await User.findOne({ where: { id: savedUser.id } });
 		expect(dbUser.firstname).toBe(update.firstname);
+	});
+
+	it("returns 403 when token is not valid", async () => {
+		const response = await putUser(5, null, { token: "123" });
+		expect(response.statusCode).toBe(403);
 	});
 });
