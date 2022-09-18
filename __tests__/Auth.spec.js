@@ -1,6 +1,7 @@
 const request = require("supertest");
 const app = require("../src/app");
 const User = require("../src/Models/UserModel");
+const Token = require("../src/Models/TokenModel");
 const sequelize = require("../src/config/db");
 const bcrypt = require("bcryptjs");
 
@@ -27,6 +28,15 @@ const addUser = async (user = { ...activeUser }) => {
 
 const postAuthentication = async (credentials) => {
 	return await request(app).post("/users/login").send(credentials);
+};
+
+const postLogout = (options = {}) => {
+	const agent = request(app).post("/users/logout");
+	if (options.token) {
+		agent.set("Authorization", options.token);
+	}
+
+	return agent.send();
 };
 
 describe("Authentication", () => {
@@ -118,5 +128,28 @@ describe("Authentication", () => {
 		});
 
 		expect(response.body.token).not.toBeUndefined();
+	});
+});
+
+describe("Logout", () => {
+	it("returns 200 OK when unauthorized request sent for logout", async () => {
+		const response = await postLogout();
+
+		expect(response.statusCode).toBe(200);
+	});
+
+	it("deletes the token from the database", async () => {
+		await addUser();
+
+		const response = await postAuthentication({
+			email: "araba@mail.com",
+			password: "verystr0ngpass",
+		});
+
+		const token = response.body.token;
+		await postLogout({ token: token });
+
+		const storedToken = await Token.findOne({ where: { token: token } });
+		expect(storedToken).toBeNull();
 	});
 });

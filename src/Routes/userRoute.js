@@ -12,5 +12,6 @@ router
 	.get(userController.getSingleUser)
 	.put(tokenAuth, userController.updateUser);
 router.route("/login").post(usersAuthController.loginUser);
+router.route("/logout").post(usersAuthController.logoutUser);
 
 module.exports = router;

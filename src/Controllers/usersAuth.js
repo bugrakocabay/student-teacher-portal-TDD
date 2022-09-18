@@ -2,8 +2,7 @@ const User = require("../Models/UserModel");
 const AppError = require("../utils/appError");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { randomString } = require("../utils/generator");
-const Token = require("../Models/TokenModel");
+const { createToken, deleteToken } = require("../utils/tokenService");
 
 exports.loginUser = async (req, res, next) => {
 	try {
@@ -17,9 +16,8 @@ exports.loginUser = async (req, res, next) => {
 		if (user.inactive)
 			return next(new AppError("Please activate your account", 403));
 
-		const token = jwt.sign({ id: user.id }, "a-very-secret", {
-			expiresIn: "2d",
-		});
+		const token = await createToken(user);
+
 		res.status(200).send({
 			id: user.id,
 			firstname: user.firstname,
@@ -29,4 +27,13 @@ exports.loginUser = async (req, res, next) => {
 	} catch (error) {
 		next(error);
 	}
+};
+
+exports.logoutUser = async (req, res, next) => {
+	const authorization = req.headers.authorization;
+	if (authorization) {
+		await deleteToken(authorization);
+	}
+
+	res.send();
 };
