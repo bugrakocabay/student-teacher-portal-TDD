@@ -14,6 +14,10 @@ const verify = async (token) => {
 	const tokenInDB = await Token.findOne({
 		where: { token: token, lastUsedAt: { [Sequelize.Op.gt]: oneWeekAgo } },
 	});
+
+	tokenInDB.lastUsedAt = new Date();
+	await tokenInDB.save();
+
 	const userId = tokenInDB.userId;
 
 	return { id: userId };
@@ -23,8 +27,19 @@ const deleteToken = async (token) => {
 	await Token.destroy({ where: { token: token } });
 };
 
+const scheduleCleanup = () => {
+	setInterval(async () => {
+		console.log("Running a cleanup");
+		const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+		await Token.destroy({
+			where: { lastUsedAt: { [Sequelize.Op.lt]: oneWeekAgo } },
+		});
+	}, 60 * 60 * 1000);
+};
+
 module.exports = {
 	createToken,
 	verify,
 	deleteToken,
+	scheduleCleanup,
 };

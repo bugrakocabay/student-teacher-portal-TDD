@@ -1,0 +1,10 @@
+{
+	"development": {
+		"username": "sisifos",
+		"password": "password",
+		"database": "school",
+		"host": "localhost",
+		"dialect": "sqlite",
+		"storage": "./development.sqlite"
+	}
+}
