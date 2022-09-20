@@ -1,6 +1,7 @@
 const Sequelize = require("sequelize");
 const sequelize = require("../config/db");
 const Class = require("./ClassModel");
+const Token = require("./TokenModel");
 
 const Model = Sequelize.Model;
 
@@ -67,6 +68,7 @@ User.init(
 	},
 	{ sequelize, modelName: "user", timestamps: true }
 );
+User.hasMany(Token, { onDelete: "cascade", foreignKey: "userId" });
 
 User.hasMany(Class);
 Class.belongsTo(User, {

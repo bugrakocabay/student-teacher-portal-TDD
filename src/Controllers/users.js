@@ -101,3 +101,27 @@ exports.updateUser = async (req, res, next) => {
 		next(error);
 	}
 };
+
+/*
+	Get the authenticated user from request. Unless it is authenticated or the 
+	ids don't match with request parameter's, send 403 error. 
+	If it is, get the user in db, destroy it and the tokens of the.
+*/
+
+exports.deleteUser = async (req, res, next) => {
+	const authenticatedUser = req.authenticatedUser;
+	try {
+		if (!authenticatedUser || authenticatedUser.id != req.params.id) {
+			return next(new AppError("Unauthorized", 403));
+		}
+		const user = await User.findOne({
+			where: { id: authenticatedUser.id },
+		}); // find user in db
+		await User.destroy({ where: { id: authenticatedUser.id } });
+
+		return res.send();
+	} catch (error) {
+		console.log(`DELETE USER ERROR ${error}`);
+		next(error);
+	}
+};

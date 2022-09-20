@@ -9,7 +9,7 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-	await User.destroy({ truncate: true });
+	await User.destroy({ truncate: { cascade: true } });
 });
 
 const putUser = async (id = 5, body = null, options = {}) => {

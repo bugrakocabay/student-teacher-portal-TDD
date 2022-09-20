@@ -10,7 +10,8 @@ router.route("/").get(userController.getUsers);
 router
 	.route("/:id")
 	.get(userController.getSingleUser)
-	.put(tokenAuth, userController.updateUser);
+	.put(tokenAuth, userController.updateUser)
+	.delete(tokenAuth, userController.deleteUser);
 router.route("/login").post(usersAuthController.loginUser);
 router.route("/logout").post(usersAuthController.logoutUser);
 

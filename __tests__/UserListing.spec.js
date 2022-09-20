@@ -8,7 +8,7 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-	await User.destroy({ truncate: true });
+	await User.destroy({ truncate: { cascade: true } });
 });
 
 describe("Listing Users", () => {
