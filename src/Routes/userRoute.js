@@ -1,8 +1,9 @@
 const express = require("express");
 const userController = require("../Controllers/users");
 const usersAuthController = require("../Controllers/usersAuth");
-const router = express.Router();
 const tokenAuth = require("../Middlewares/tokenAuth");
+
+const router = express.Router();
 
 router.route("/register").post(userController.createUser);
 router.route("/token/:token").post(userController.activateAccount);

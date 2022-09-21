@@ -9,6 +9,7 @@ app.use(express.json());
 
 // Route Handlers
 app.use("/users", require("../src/Routes/userRoute"));
+app.use("/classes", require("../src/Routes/classRoute"));
 
 app.all("*", (req, res, next) => {
 	next(new AppError(`Can't find ${req.originalUrl}`, 404));
