@@ -6,6 +6,6 @@ scheduleCleanup();
 
 app.listen(3000, () => {
 	logger.info(
-		`APP HAS STARTED AT localhost:3000 | version ${process.env.npm_package_version}`
+		`APP HAS STARTED AT localhost:3000 version ${process.env.npm_package_version}`
 	);
 });

@@ -1,9 +1,9 @@
 const { createLogger, transports, format } = require("winston");
 
 const customFormat = format.combine(
-	format.timestamp(),
+	format.timestamp({ format: "hh:mm:ss YYYY-MM-DD" }),
 	format.printf((info) => {
-		return `${info.timestamp} [${info.level.toUpperCase().padEnd(7)}] : ${
+		return `[${info.level.toUpperCase().padEnd(7)}] | ${info.timestamp} | ${
 			info.message
 		}`;
 	})
