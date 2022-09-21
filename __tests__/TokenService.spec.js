@@ -2,9 +2,11 @@ const sequelize = require("../src/config/db");
 const Token = require("../src/Models/TokenModel");
 const { scheduleCleanup } = require("../src/utils/tokenService");
 
-beforeAll(async () => {
-	await sequelize.sync();
-});
+if (process.env.NODE_ENV == "test") {
+	beforeAll(async () => {
+		await sequelize.sync();
+	});
+}
 
 beforeEach(async () => {
 	await Token.destroy({ truncate: true });

@@ -4,9 +4,11 @@ const User = require("../src/Models/UserModel");
 const sequelize = require("../src/config/db");
 const bcrypt = require("bcryptjs");
 
-beforeAll(async () => {
-	await sequelize.sync();
-});
+if (process.env.NODE_ENV == "test") {
+	beforeAll(async () => {
+		await sequelize.sync();
+	});
+}
 
 beforeEach(async () => {
 	await User.destroy({ truncate: { cascade: true } });

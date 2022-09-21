@@ -6,7 +6,9 @@
 	"scripts": {
 		"test": "cross-env NODE_ENV=test jest --watch --runInBand",
 		"start": "cross-env NODE_ENV=development nodemon server.js",
-		"test:staging": "cross-env NODE_ENV=staging jest -f . --runInBand"
+		"test:staging": "cross-env NODE_ENV=staging jest -f . --runInBand --all",
+		"migrate:test": "cross-env NODE_ENV=staging sequelize-cli db:migrate",
+		"pretest:staging": "npm run migrate:test"
 	},
 	"keywords": [],
 	"author": "",

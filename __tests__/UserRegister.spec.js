@@ -26,9 +26,10 @@ beforeAll(async () => {
 			});
 		},
 	});
-
+	if (process.env.NODE_ENV == "test") {
+		await sequelize.sync();
+	}
 	await server.listen(8587, "localhost");
-	await sequelize.sync();
 	jest.setTimeout(20000);
 });
 
@@ -114,7 +115,6 @@ describe("User Registration", () => {
 	it("returns error when a used email entered", async () => {
 		await User.create({ ...validUser });
 		const response = await postUser();
-
 		expect(response.body.message).toBe("email is already taken");
 	});
 

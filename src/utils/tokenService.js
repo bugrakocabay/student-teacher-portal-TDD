@@ -29,7 +29,6 @@ const deleteToken = async (token) => {
 
 const scheduleCleanup = () => {
 	setInterval(async () => {
-		console.log("Running a cleanup");
 		const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 		await Token.destroy({
 			where: { lastUsedAt: { [Sequelize.Op.lt]: oneWeekAgo } },
