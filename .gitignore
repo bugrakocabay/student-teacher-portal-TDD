@@ -2,3 +2,4 @@ node_modules
 development.sqlite
 test.sqlite
 staging.sqlite
+app.log

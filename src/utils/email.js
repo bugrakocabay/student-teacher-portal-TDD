@@ -1,12 +1,13 @@
 const nodemailer = require("nodemailer");
 const config = require("config");
+const logger = require("./logger");
 const mailConfig = config.get("mail");
 
 const transporter = nodemailer.createTransport({ ...mailConfig });
 
 const sendAccountActivation = async (email, token) => {
 	const info = await transporter.sendMail({
-		from: "My app <info@mail.com>",
+		from: "buttersx300@hotmail.com.tr",
 		to: email,
 		subject: "Account activation",
 		html: `
@@ -18,9 +19,7 @@ const sendAccountActivation = async (email, token) => {
 		</div>`,
 	});
 
-	if (process.env.NODE_ENV === "development") {
-		console.log(`url: ${nodemailer.getTestMessageUrl(info)}`);
-	}
+	logger.info(`url: ${nodemailer.getTestMessageUrl(info)}`);
 };
 
 module.exports = { sendAccountActivation };
