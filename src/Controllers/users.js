@@ -6,7 +6,7 @@ const { randomString } = require("../utils/generator");
 
 exports.createUser = async (req, res, next) => {
 	try {
-		const { firstname, lastname, email, password } = req.body;
+		const { firstname, lastname, email, password, role } = req.body;
 		if (!password) return next(new AppError("password cannot be null", 400));
 		if (!email) return next(new AppError("email cannot be null", 400));
 
@@ -17,6 +17,7 @@ exports.createUser = async (req, res, next) => {
 			lastname,
 			email,
 			password: hashedpassword,
+			role,
 			activationToken: randomString(16),
 		};
 		await emailService.sendAccountActivation(email, user.activationToken);

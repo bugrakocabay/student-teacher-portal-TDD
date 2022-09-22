@@ -3,6 +3,7 @@ const app = require("../src/app");
 const sequelize = require("../src/config/db");
 const User = require("../src/Models/UserModel");
 const Class = require("../src/Models/ClassModel");
+const Token = require("../src/Models/TokenModel");
 const bcrypt = require("bcryptjs");
 
 if (process.env.NODE_ENV == "test") {
@@ -14,13 +15,13 @@ if (process.env.NODE_ENV == "test") {
 beforeEach(async () => {
 	await User.destroy({ truncate: { cascade: true } });
 	await Class.destroy({ truncate: { cascade: true } });
+	await Token.destroy({ truncate: { cascade: true } });
 });
 
 const credentials = { email: "terlik@mail.com", password: "verystr0ngpass" };
 const classBody = {
 	class_name: "computer science",
 	date: "2022-12-12 12:00:00",
-	teacher: "osman teacher",
 };
 
 const postClass = async (body = classBody, options = {}) => {
@@ -71,28 +72,40 @@ describe("Create Class", () => {
 	});
 
 	it("returns 200 when valid class submitted by authorized user", async () => {
-		await addUser();
-		const response = await postClass(
-			{ classBody },
-			{ auth: { email: "terlik@mail.com", password: "verystr0ngpass" } }
-		);
+		await addUser({ ...activeUser, role: "teacher" });
+		const response = await postClass(classBody, {
+			auth: credentials,
+		});
 
 		expect(response.statusCode).toBe(200);
 	});
 
 	it("returns success message when valid class submitted by authorized user", async () => {
-		await addUser();
-		const response = await postClass({ classBody }, { auth: credentials });
+		await addUser({ ...activeUser, role: "teacher" });
+		const response = await postClass(classBody, {
+			auth: credentials,
+		});
 
 		expect(response.body.message).toBe("class created");
 	});
 
 	it("saves class user to database when authorized user sends valid request", async () => {
-		await addUser();
-		await postClass({ classBody }, { auth: credentials });
+		await addUser({ ...activeUser, role: "teacher" });
+		await postClass(classBody, {
+			auth: credentials,
+		});
 
 		const classes = await Class.findAll();
 
 		expect(classes.length).toBe(1);
+	});
+
+	it("returns 401 when a student tries to create class", async () => {
+		await addUser();
+		const response = await postClass(classBody, {
+			auth: credentials,
+		});
+
+		expect(response.statusCode).toBe(401);
 	});
 });
