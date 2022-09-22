@@ -18,11 +18,16 @@ exports.createClass = async (req, res, next) => {
 				date,
 				teacher: `${teacher.firstname} ${teacher.lastname}`,
 			};
-			const newClass = await Class.create(newClassObj);
 
-			return res
-				.status(200)
-				.send({ status: "success", message: "class created" });
+			try {
+				const newClass = await Class.create(newClassObj);
+
+				return res
+					.status(200)
+					.send({ status: "success", message: "class created" });
+			} catch (error) {
+				return next(new AppError(error.errors[0].message, 400));
+			}
 		}
 
 		return next(new AppError("Unauthorized", 401));

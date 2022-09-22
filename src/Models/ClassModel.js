@@ -14,8 +14,18 @@ Class.init(
 			primaryKey: true,
 		},
 		class_name: {
-			type: Sequelize.INTEGER,
+			type: Sequelize.STRING(30),
 			allowNull: false,
+
+			validate: {
+				notNull: {
+					msg: "class name cannot be null",
+				},
+				len: {
+					args: [3, 30],
+					msg: "class name length can be between 3-30 characters",
+				},
+			},
 		},
 		date: {
 			type: Sequelize.DATE,

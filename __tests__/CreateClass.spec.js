@@ -15,7 +15,6 @@ if (process.env.NODE_ENV == "test") {
 beforeEach(async () => {
 	await User.destroy({ truncate: { cascade: true } });
 	await Class.destroy({ truncate: { cascade: true } });
-	await Token.destroy({ truncate: { cascade: true } });
 });
 
 const credentials = { email: "terlik@mail.com", password: "verystr0ngpass" };
@@ -107,5 +106,54 @@ describe("Create Class", () => {
 		});
 
 		expect(response.statusCode).toBe(401);
+	});
+
+	it("returns 400 when incorrect class data posted", async () => {
+		await addUser({ ...activeUser, role: "teacher" });
+		const response = await postClass(
+			{
+				class_name: "as",
+				date: "2022-12-12 12:00:00",
+			},
+			{
+				auth: credentials,
+			}
+		);
+
+		expect(response.statusCode).toBe(400);
+	});
+
+	it("returns error message when short class name posted", async () => {
+		await addUser({ ...activeUser, role: "teacher" });
+		const response = await postClass(
+			{
+				class_name: "as",
+				date: "2022-12-12 12:00:00",
+			},
+			{
+				auth: credentials,
+			}
+		);
+
+		expect(response.body.message).toBe(
+			"class name length can be between 3-30 characters"
+		);
+	});
+
+	it("returns error message when long class name posted", async () => {
+		await addUser({ ...activeUser, role: "teacher" });
+		const response = await postClass(
+			{
+				class_name: "this-text-is-longer-than-30-characters",
+				date: "2022-12-12 12:00:00",
+			},
+			{
+				auth: credentials,
+			}
+		);
+
+		expect(response.body.message).toBe(
+			"class name length can be between 3-30 characters"
+		);
 	});
 });
