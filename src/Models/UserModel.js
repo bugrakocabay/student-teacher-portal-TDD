@@ -58,6 +58,10 @@ User.init(
 				},
 			},
 		},
+		role: {
+			type: Sequelize.ENUM("student", "teacher", "admin"),
+			defaultValue: "student",
+		},
 		inactive: {
 			type: Sequelize.BOOLEAN,
 			defaultValue: true,
@@ -69,11 +73,6 @@ User.init(
 	{ sequelize, modelName: "user", timestamps: true }
 );
 User.hasMany(Token, { onDelete: "cascade", foreignKey: "userId" });
-
-User.hasMany(Class);
-Class.belongsTo(User, {
-	foreignKey: "userId",
-});
 
 sequelize.sync();
 

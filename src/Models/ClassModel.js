@@ -19,10 +19,19 @@ Class.init(
 		},
 		date: {
 			type: Sequelize.DATE,
-			defaultValue: new Date().toJSON,
+		},
+		teacher: {
+			type: Sequelize.STRING,
+		},
+		status: {
+			type: Sequelize.ENUM("pending", "finished"),
+			defaultValue: "pending",
+		},
+		userId: {
+			type: Sequelize.INTEGER,
 		},
 	},
-	{ sequelize, timestamps: true }
+	{ sequelize, modelName: "classes", timestamps: true }
 );
 
 module.exports = Class;
