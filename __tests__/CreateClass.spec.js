@@ -3,7 +3,6 @@ const app = require("../src/app");
 const sequelize = require("../src/config/db");
 const User = require("../src/Models/UserModel");
 const Class = require("../src/Models/ClassModel");
-const Token = require("../src/Models/TokenModel");
 const bcrypt = require("bcryptjs");
 
 if (process.env.NODE_ENV == "test") {
