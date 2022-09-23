@@ -14,7 +14,6 @@ if (process.env.NODE_ENV == "test") {
 
 beforeEach(async () => {
 	await User.destroy({ truncate: { cascade: true } });
-	await Class.destroy({ truncate: { cascade: true } });
 });
 
 const credentials = { email: "terlik@mail.com", password: "verystr0ngpass" };
@@ -155,5 +154,15 @@ describe("Create Class", () => {
 		expect(response.body.message).toBe(
 			"class name length can be between 3-30 characters"
 		);
+	});
+
+	it("saves userId in class table", async () => {
+		let user = await addUser({ ...activeUser, role: "teacher" });
+		await postClass(classBody, {
+			auth: credentials,
+		});
+
+		const newClass = await Class.findAll();
+		expect(newClass[0].userId).toBe(user.id);
 	});
 });

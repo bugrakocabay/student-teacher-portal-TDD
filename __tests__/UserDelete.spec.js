@@ -2,6 +2,7 @@ const request = require("supertest");
 const app = require("../src/app");
 const User = require("../src/Models/UserModel");
 const Token = require("../src/Models/TokenModel");
+const Class = require("../src/Models/ClassModel");
 const sequelize = require("../src/config/db");
 const bcrypt = require("bcryptjs");
 
@@ -48,6 +49,8 @@ const addUser = async (user = { ...activeUser }) => {
 	return await User.create(user);
 };
 
+const credentials = { email: "terlik@mail.com", password: "verystr0ngpass" };
+
 describe("User Delete", () => {
 	it("returns 403 forbidden when sent without authorization", async () => {
 		const response = await deleteUser();
@@ -69,7 +72,7 @@ describe("User Delete", () => {
 			email: "user2@mail.com",
 		});
 		const token = await auth({
-			auth: { email: "terlik@mail.com", password: "verystr0ngpass" },
+			auth: credentials,
 		});
 
 		const respone = await deleteUser(userToDelete.id, { token: token });
@@ -84,7 +87,7 @@ describe("User Delete", () => {
 	it("returns 200 OK when delete request sent from authorized user", async () => {
 		const savedUser = await addUser();
 		const token = await auth({
-			auth: { email: "terlik@mail.com", password: "verystr0ngpass" },
+			auth: credentials,
 		});
 		const response = await deleteUser(savedUser.id, { token: token });
 		expect(response.statusCode).toBe(200);
@@ -93,7 +96,7 @@ describe("User Delete", () => {
 	it("deletes user from database when request sent from authorized user", async () => {
 		const savedUser = await addUser();
 		const token = await auth({
-			auth: { email: "terlik@mail.com", password: "verystr0ngpass" },
+			auth: credentials,
 		});
 		await deleteUser(savedUser.id, { token: token });
 		const dbUser = await User.findOne({ where: { id: savedUser.id } });
@@ -104,7 +107,7 @@ describe("User Delete", () => {
 	it("deletes token from database when delete request sent from authorized user", async () => {
 		const savedUser = await addUser();
 		const token = await auth({
-			auth: { email: "terlik@mail.com", password: "verystr0ngpass" },
+			auth: credentials,
 		});
 		await deleteUser(savedUser.id, { token: token });
 		const tokenDB = await Token.findOne({ where: { token: token } });
@@ -115,15 +118,34 @@ describe("User Delete", () => {
 	it("deletes all token from database when delete request sent from authorized user", async () => {
 		const savedUser = await addUser();
 		const token = await auth({
-			auth: { email: "terlik@mail.com", password: "verystr0ngpass" },
+			auth: credentials,
 		});
 		const token2 = await auth({
-			auth: { email: "terlik@mail.com", password: "verystr0ngpass" },
+			auth: credentials,
 		});
 
 		await deleteUser(savedUser.id, { token: token });
 		const token2DB = await Token.findOne({ where: { token: token2 } });
 
 		expect(token2DB).toBeNull();
+	});
+
+	it("deletes class from database when related user is deleted", async () => {
+		let user = await addUser({ ...activeUser, role: "teacher" });
+		const token = await auth({
+			auth: credentials,
+		});
+		await request(app)
+			.post("/classes/create-class")
+			.set("Authorization", token)
+			.send({
+				class_name: "computer science",
+				date: "2022-12-12 12:00:00",
+			});
+
+		await deleteUser(user.id, { token: token });
+
+		const newClass = await Class.findAll();
+		expect(newClass.length).toBe(0);
 	});
 });

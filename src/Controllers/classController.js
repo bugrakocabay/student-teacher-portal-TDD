@@ -17,6 +17,7 @@ exports.createClass = async (req, res, next) => {
 				class_name,
 				date,
 				teacher: `${teacher.firstname} ${teacher.lastname}`,
+				userId: teacher.id,
 			};
 
 			try {

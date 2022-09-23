@@ -73,6 +73,7 @@ User.init(
 	{ sequelize, modelName: "user", timestamps: true }
 );
 User.hasMany(Token, { onDelete: "cascade", foreignKey: "userId" });
+User.hasMany(Class, { onDelete: "cascade", foreignKey: "userId" });
 
 sequelize.sync();
 
