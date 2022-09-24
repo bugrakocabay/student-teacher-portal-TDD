@@ -31,7 +31,7 @@ exports.createClass = async (req, res, next) => {
 			}
 		}
 
-		return next(new AppError("Unauthorized", 401));
+		return next(new AppError("Unauthorized", 403));
 	} catch (error) {
 		console.log(`CREATE CLASS ERROR ${error}`);
 		next(error);
@@ -64,4 +64,23 @@ exports.getClasses = async (req, res, next) => {
 		console.log("GET ALL CLASSES ERROR " + error);
 		next(error);
 	}
+};
+
+exports.deleteClass = async (req, res, next) => {
+	if (req.authenticatedUser) {
+		const teacher = await User.findOne({
+			where: { id: req.authenticatedUser.id },
+		});
+
+		if (teacher.role === "student") {
+			return next(new AppError("Unauthorized", 401));
+		}
+		try {
+			await Class.destroy({ where: { id: req.params.id } });
+			res.send();
+		} catch (error) {
+			console.log(error);
+		}
+	}
+	return next(new AppError("Unauthorized", 403));
 };

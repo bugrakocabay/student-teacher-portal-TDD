@@ -56,10 +56,10 @@ const addUser = async (user = { ...activeUser }) => {
 };
 
 describe("Create Class", () => {
-	it("returns 401 when post class has no authentication", async () => {
+	it("returns 403 when post class has no authentication", async () => {
 		const response = await postClass();
 
-		expect(response.statusCode).toBe(401);
+		expect(response.statusCode).toBe(403);
 	});
 
 	it("returns unauthorized message when post class has no authentication", async () => {
