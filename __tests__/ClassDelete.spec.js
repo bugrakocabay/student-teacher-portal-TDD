@@ -88,20 +88,48 @@ describe("Delete Class", () => {
 	});
 
 	it("returns 200 when user is fully authenticated", async () => {
-		await addUser({ ...activeUser, role: "teacher" });
-
+		let teacher = await addUser({ ...activeUser, role: "teacher" });
 		let token = await auth({ auth: credentials });
+		let newClass = await addClass({ ...classBody, userId: teacher.id });
 
-		const respone = await deleteClass(5, { token: token });
+		const respone = await deleteClass(newClass.id, { token: token });
 		expect(respone.statusCode).toBe(200);
 	});
 
 	it("deletes the class from database with valid request", async () => {
+		let teacher = await addUser({ ...activeUser, role: "teacher" });
+		let token = await auth({ auth: credentials });
+		let newClass = await addClass({ ...classBody, userId: teacher.id });
+
+		await deleteClass(newClass.id, { token: token });
+		const classDB = await Class.findOne({ where: { id: newClass.id } });
+
+		expect(classDB).toBeNull();
+	});
+
+	it("returns 404 when class doesnt exist in database", async () => {
 		await addUser({ ...activeUser, role: "teacher" });
 		let token = await auth({ auth: credentials });
-		let newClass = await addClass();
 
+		const respone = await deleteClass(5, { token: token });
+		expect(respone.statusCode).toBe(404);
+	});
+
+	it("returns 401 when a teacher tries to delete another teachers class", async () => {
+		let otherTeacher = await addUser({
+			firstname: "osman",
+			lastname: "ahmet",
+			email: "televizyon@mail.com",
+			inactive: false,
+			password: "verystr0ngpass",
+			role: "teacher",
+		});
+		let newClass = await addClass({ ...classBody, userId: otherTeacher.id });
+
+		await addUser({ ...activeUser, role: "teacher" });
+		let token = await auth({ auth: credentials });
 		const respone = await deleteClass(newClass.id, { token: token });
-		expect(respone.statusCode).toBe(200);
+
+		expect(respone.statusCode).toBe(401);
 	});
 });

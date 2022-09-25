@@ -67,20 +67,50 @@ exports.getClasses = async (req, res, next) => {
 };
 
 exports.deleteClass = async (req, res, next) => {
-	if (req.authenticatedUser) {
-		const teacher = await User.findOne({
-			where: { id: req.authenticatedUser.id },
-		});
+	try {
+		if (req.authenticatedUser) {
+			const teacher = await User.findOne({
+				where: { id: req.authenticatedUser.id },
+			});
 
-		if (teacher.role === "student") {
-			return next(new AppError("Unauthorized", 401));
+			if (teacher.role === "student") {
+				return next(new AppError("Unauthorized", 401));
+			}
+			try {
+				let classToDelete = await Class.findOne({
+					where: { id: req.params.id },
+				});
+				if (!classToDelete)
+					return next(new AppError("Can't find this class", 404));
+
+				if (classToDelete.userId !== teacher.id) {
+					return next(new AppError("Unauthorized", 401));
+				}
+
+				await Class.destroy({ where: { id: req.params.id } });
+				return res
+					.status(200)
+					.send({ status: "success", message: "Class deleted" });
+			} catch (error) {
+				console.log(error);
+			}
+		} else {
+			return next(new AppError("Unauthorized", 403));
 		}
-		try {
-			await Class.destroy({ where: { id: req.params.id } });
-			res.send();
-		} catch (error) {
-			console.log(error);
-		}
+	} catch (error) {
+		console.log("DELETE CLASS ERROR " + error);
+		next(error);
 	}
-	return next(new AppError("Unauthorized", 403));
 };
+
+/*const makeClass = async (num) => {
+	for (i = 0; i < num; i++) {
+		await Class.create({
+			class_name: `class${i + 1}`,
+			date: "2022-03-01 10:00:00",
+			teacher: `teacher${i + 1}`,
+		});
+	}
+};
+
+makeClass(25);*/
