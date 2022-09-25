@@ -61,16 +61,16 @@ const addClass = async (body = classBody) => {
 };
 
 describe("Delete Class", () => {
-	it("returns 403 when request it unauthorized", async () => {
+	it("returns 403 when request it unauthenticated", async () => {
 		const response = await deleteClass();
 
-		expect(response.statusCode).toBe(403);
+		expect(response.statusCode).toBe(401);
 	});
 
 	it("returns 403 when token is invalid ", async () => {
 		const response = await deleteClass(5, { token: "abcd" });
 
-		expect(response.statusCode).toBe(403);
+		expect(response.statusCode).toBe(401);
 	});
 
 	it("returns error message when request it unauthorized", async () => {
@@ -85,7 +85,7 @@ describe("Delete Class", () => {
 
 		const respone = await deleteClass(5, { token: token });
 
-		expect(respone.statusCode).toBe(401);
+		expect(respone.statusCode).toBe(403);
 	});
 
 	it("returns 200 when user is fully authenticated", async () => {
@@ -131,6 +131,6 @@ describe("Delete Class", () => {
 		let token = await auth({ auth: credentials });
 		const respone = await deleteClass(newClass.id, { token: token });
 
-		expect(respone.statusCode).toBe(401);
+		expect(respone.statusCode).toBe(403);
 	});
 });

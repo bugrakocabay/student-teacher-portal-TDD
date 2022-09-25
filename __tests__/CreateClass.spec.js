@@ -60,7 +60,7 @@ describe("Create Class", () => {
 	it("returns 403 when post class has no authentication", async () => {
 		const response = await postClass();
 
-		expect(response.statusCode).toBe(403);
+		expect(response.statusCode).toBe(401);
 	});
 
 	it("returns unauthorized message when post class has no authentication", async () => {
@@ -104,7 +104,7 @@ describe("Create Class", () => {
 			auth: credentials,
 		});
 
-		expect(response.statusCode).toBe(401);
+		expect(response.statusCode).toBe(403);
 	});
 
 	it("returns 400 when incorrect class data posted", async () => {

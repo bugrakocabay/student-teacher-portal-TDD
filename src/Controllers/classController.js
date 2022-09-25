@@ -2,6 +2,11 @@ const AppError = require("../utils/appError");
 const Class = require("../Models/ClassModel");
 const User = require("../Models/UserModel");
 
+/*
+ * Check if user is authenticated >> find authenticated users info in db >> if user is a "student" return Unauthorized,
+ * If user is authorized, get class info from request body store them into "newClassObj".
+ * Create class in db with the object, if it is success, return 200. Unless, return 400 bad request.
+ */
 exports.createClass = async (req, res, next) => {
 	try {
 		if (req.authenticatedUser) {
@@ -10,7 +15,7 @@ exports.createClass = async (req, res, next) => {
 			});
 
 			if (teacher.role === "student") {
-				return next(new AppError("Unauthorized", 401));
+				return next(new AppError("Unauthorized", 403));
 			}
 			const { class_name, date } = req.body;
 			let newClassObj = {
@@ -31,13 +36,18 @@ exports.createClass = async (req, res, next) => {
 			}
 		}
 
-		return next(new AppError("Unauthorized", 403));
+		return next(new AppError("Unauthorized", 401));
 	} catch (error) {
 		console.log(`CREATE CLASS ERROR ${error}`);
 		next(error);
 	}
 };
 
+/*
+ * Check if user is authenticated, store pagination statements into variables for later use.
+ * Get all classes from db with given attributes with limits.
+ * Return all to user with pages of 10.
+ */
 exports.getClasses = async (req, res, next) => {
 	try {
 		if (req.authenticatedUser) {
@@ -85,6 +95,11 @@ exports.getSingleClass = async (req, res, next) => {
 	}
 };
 
+/*
+ * Check if user is authenticated, >> find authenticated users info in db >> if user is a "student" return Unauthorized,
+ * Get class to delete from db, if it does not exist, return 404. If the class does not belong to user, who sends the request, return 403.
+ * Delete class from db and send 200 response.
+ */
 exports.deleteClass = async (req, res, next) => {
 	try {
 		if (req.authenticatedUser) {
@@ -93,7 +108,7 @@ exports.deleteClass = async (req, res, next) => {
 			});
 
 			if (teacher.role === "student") {
-				return next(new AppError("Unauthorized", 401));
+				return next(new AppError("Unauthorized", 403));
 			}
 			try {
 				let classToDelete = await Class.findOne({
@@ -103,7 +118,7 @@ exports.deleteClass = async (req, res, next) => {
 					return next(new AppError("Can't find this class", 404));
 
 				if (classToDelete.userId !== teacher.id) {
-					return next(new AppError("Unauthorized", 401));
+					return next(new AppError("Unauthorized", 403));
 				}
 
 				await Class.destroy({ where: { id: req.params.id } });
@@ -114,7 +129,7 @@ exports.deleteClass = async (req, res, next) => {
 				console.log(error);
 			}
 		} else {
-			return next(new AppError("Unauthorized", 403));
+			return next(new AppError("Unauthorized", 401));
 		}
 	} catch (error) {
 		console.log("DELETE CLASS ERROR " + error);
@@ -122,6 +137,11 @@ exports.deleteClass = async (req, res, next) => {
 	}
 };
 
+/*
+ * Check if user is authenticated, return 401 if not, >> find authenticated users info in db >> if user is a "student" return Unauthorized,
+ * Destructure request body. Find class to update in db, if it does not exist, return 404. Check if the class does not belong to user, who sends the request, return 403.
+ * Set the attributes and save it, if they pass validations return 200 success, otherwise return 400.
+ */
 exports.updateClass = async (req, res, next) => {
 	try {
 		if (!req.authenticatedUser) {
@@ -154,7 +174,7 @@ exports.updateClass = async (req, res, next) => {
 
 			return res.send({ status: "success", message: "Updated successfully" });
 		} catch (error) {
-			console.log(error);
+			return next(new AppError(error.errors[0].message, 400));
 		}
 	} catch (error) {
 		console.log("UPDATE CLASS ERROR " + error);

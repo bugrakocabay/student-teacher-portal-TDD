@@ -72,7 +72,11 @@ describe("User Update", () => {
 
 	it("returns 200 OK when user update is successful", async () => {
 		const savedUser = await addUser();
-		const update = { firstname: "cemsit" };
+		const update = {
+			firstname: "cemsit",
+			lastname: "mehmet",
+			email: "user@mail.com",
+		};
 
 		const response = await putUser(savedUser.id, update, {
 			auth: { email: savedUser.email, password: "verystr0ngpass" },
@@ -82,7 +86,11 @@ describe("User Update", () => {
 
 	it("updates firstname in database with valid authorization", async () => {
 		const savedUser = await addUser();
-		const update = { firstname: "cemsit" };
+		const update = {
+			firstname: "cemsit",
+			lastname: "mehmet",
+			email: "user@mail.com",
+		};
 		await putUser(savedUser.id, update, {
 			auth: { email: savedUser.email, password: "verystr0ngpass" },
 		});

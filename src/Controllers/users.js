@@ -93,12 +93,15 @@ exports.updateUser = async (req, res, next) => {
 		}
 		const user = await User.findOne({
 			where: { id: authenticatedUser.id },
-		}); // find user in db
+		});
 		user.firstname = firstname;
+		user.lastname = lastname;
+		user.email = email;
+
 		await user.save();
 		return res.send();
 	} catch (error) {
-		console.log(`UPDATE USER ERROR ${error}`);
+		//console.log(`UPDATE USER ERROR ${error}`);
 		next(error);
 	}
 };

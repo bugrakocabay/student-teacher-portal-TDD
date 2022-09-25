@@ -1,13 +1,10 @@
 const Sequelize = require("sequelize");
 const config = require("config");
 
+// Get database credentials from config file
 const dbConfig = config.get("database");
 
-// const sequelize = new Sequelize(
-// 	`postgres://${dbConfig.DBUSER}:${dbConfig.DBPASS}@${dbConfig.DBHOST}:${dbConfig.DBPORT}/${dbConfig.DBNAME}`,
-// 	{ dialect: "postgres", logging: false }
-// );
-
+// Establish connection with db
 const sequelize = new Sequelize(
 	dbConfig.database,
 	dbConfig.username,
