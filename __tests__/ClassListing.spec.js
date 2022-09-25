@@ -13,6 +13,7 @@ if (process.env.NODE_ENV == "test") {
 
 beforeEach(async () => {
 	await User.destroy({ truncate: { cascade: true } });
+	await Class.destroy({ truncate: { cascade: true } });
 });
 
 const activeUser = {
@@ -48,6 +49,22 @@ const getClasses = async (options = {}) => {
 	}
 	if (options.token) {
 		agent.set("Authorization", options.token);
+	}
+
+	return agent;
+};
+
+const getSingleClass = async (id = 5, options = {}) => {
+	let agent = request(app);
+	let token;
+	if (options.auth) {
+		const response = await agent.post(`/users/login/`).send(options.auth);
+		token = response.body.token;
+	}
+	agent = request(app).get(`/classes/${id}`).send();
+
+	if (token) {
+		agent.set("Authorization", token);
 	}
 
 	return agent;
@@ -149,5 +166,56 @@ describe("Listing Classes", () => {
 		const response = await getClasses({ auth: credentials, query: "page=-5" });
 
 		expect(response.body.page).toBe(0);
+	});
+});
+
+describe("Get single class", () => {
+	it("returns 401 when user is not authenticated", async () => {
+		const response = await getSingleClass();
+
+		expect(response.statusCode).toBe(401);
+	});
+
+	it("returns 404 when class does not exist", async () => {
+		await addUser();
+		const response = await getSingleClass(5, { auth: credentials });
+
+		expect(response.statusCode).toBe(404);
+	});
+
+	it("returns error message when class does not exist", async () => {
+		await addUser();
+		const response = await getSingleClass(5, { auth: credentials });
+
+		expect(response.body.message).toBe("Can't find this class");
+	});
+
+	it("returns 200 when request made with valid credentials", async () => {
+		await addUser();
+		const newClass = await Class.create({
+			class_name: "computer science",
+			date: "2022-12-12 12:00:00",
+		});
+		const response = await getSingleClass(newClass.id, { auth: credentials });
+
+		expect(response.statusCode).toBe(200);
+	});
+
+	it("returns id, name, date, teacher,status in response body", async () => {
+		await addUser();
+		const newClass = await Class.create({
+			class_name: "computer science",
+			date: "2022-12-12 12:00:00",
+		});
+
+		const response = await getSingleClass(newClass.id, { auth: credentials });
+
+		expect(Object.keys(response.body)).toEqual([
+			"id",
+			"class_name",
+			"date",
+			"teacher",
+			"status",
+		]);
 	});
 });

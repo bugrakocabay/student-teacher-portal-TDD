@@ -66,6 +66,25 @@ exports.getClasses = async (req, res, next) => {
 	}
 };
 
+exports.getSingleClass = async (req, res, next) => {
+	try {
+		if (req.authenticatedUser) {
+			const singleClass = await Class.findOne({
+				where: { id: req.params.id },
+				attributes: ["id", "class_name", "date", "teacher", "status"],
+			});
+			if (!singleClass) return next(new AppError("Can't find this class", 404));
+
+			res.send(singleClass);
+		} else {
+			return next(new AppError("Unauthorized", 401));
+		}
+	} catch (error) {
+		console.log("GET SINGLE CLASS ERROR " + error);
+		next(error);
+	}
+};
+
 exports.deleteClass = async (req, res, next) => {
 	try {
 		if (req.authenticatedUser) {
@@ -99,6 +118,46 @@ exports.deleteClass = async (req, res, next) => {
 		}
 	} catch (error) {
 		console.log("DELETE CLASS ERROR " + error);
+		next(error);
+	}
+};
+
+exports.updateClass = async (req, res, next) => {
+	try {
+		if (!req.authenticatedUser) {
+			return next(new AppError("Unauthorized", 401));
+		}
+
+		const teacher = await User.findOne({
+			where: { id: req.authenticatedUser.id },
+		});
+
+		if (teacher.role === "student") {
+			return next(new AppError("Unauthorized", 403));
+		}
+
+		try {
+			const { class_name, date, status } = req.body;
+
+			let classToUpdate = await Class.findOne({
+				where: { id: req.params.id },
+			});
+			if (!classToUpdate)
+				return next(new AppError("Can't find this class", 404));
+			if (classToUpdate.userId !== teacher.id)
+				return next(new AppError("Unauthorized", 403));
+
+			classToUpdate.class_name = class_name;
+			classToUpdate.date = date;
+			classToUpdate.status = status;
+			await classToUpdate.save();
+
+			return res.send({ status: "success", message: "Updated successfully" });
+		} catch (error) {
+			console.log(error);
+		}
+	} catch (error) {
+		console.log("UPDATE CLASS ERROR " + error);
 		next(error);
 	}
 };

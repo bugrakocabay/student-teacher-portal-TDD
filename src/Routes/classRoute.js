@@ -5,6 +5,10 @@ const router = express.Router();
 
 router.route("/create-class").post(tokenAuth, classController.createClass);
 router.route("/").get(tokenAuth, classController.getClasses);
-router.route("/:id").delete(tokenAuth, classController.deleteClass);
+router
+	.route("/:id")
+	.delete(tokenAuth, classController.deleteClass)
+	.put(tokenAuth, classController.updateClass)
+	.get(tokenAuth, classController.getSingleClass);
 
 module.exports = router;

@@ -13,6 +13,7 @@ if (process.env.NODE_ENV == "test") {
 
 beforeEach(async () => {
 	await User.destroy({ truncate: { cascade: true } });
+	await Class.destroy({ truncate: { cascade: true } });
 });
 
 const auth = async (options = {}) => {
