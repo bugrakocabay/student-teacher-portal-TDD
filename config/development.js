@@ -8,11 +8,16 @@ module.exports = {
 		logging: false,
 	},
 	mail: {
-		host: "smtp.ethereal.email",
+		/*host: "smtp.ethereal.email",
 		port: 587,
 		auth: {
 			user: "luther.parker@ethereal.email",
 			pass: "sKGNXcJVTA8JzgSRUX",
+		},*/
+		service: "hotmail",
+		auth: {
+			user: process.env.MAIL,
+			pass: process.env.MAILPASS,
 		},
 	},
 };
