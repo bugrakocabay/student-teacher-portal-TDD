@@ -44,7 +44,7 @@ afterAll(async () => {
 });
 
 const postUser = (user = validUser) => {
-	return request(app).post("/users/register").send(user);
+	return request(app).post("/api/v1/users/register").send(user);
 };
 
 const validUser = {
@@ -187,7 +187,7 @@ describe("Account Activation", () => {
 		let token = users[0].activationToken;
 
 		await request(app)
-			.post("/users/token/" + token)
+			.post("/api/v1/users/token/" + token)
 			.send();
 		users = await User.findAll();
 		expect(users[0].inactive).toBe(false);
@@ -199,7 +199,7 @@ describe("Account Activation", () => {
 		const token = users[0].activationToken;
 
 		await request(app)
-			.post("/users/token/" + token)
+			.post("/api/v1/users/token/" + token)
 			.send();
 
 		users = await User.findAll();
@@ -211,7 +211,7 @@ describe("Account Activation", () => {
 		const token = "this-token-does-not-exist";
 
 		await request(app)
-			.post("/users/token/" + token)
+			.post("/api/v1/users/token/" + token)
 			.send();
 
 		let users = await User.findAll();
@@ -223,7 +223,7 @@ describe("Account Activation", () => {
 		const token = "this-token-does-not-exist";
 
 		let response = await request(app)
-			.post("/users/token/" + token)
+			.post("/api/v1/users/token/" + token)
 			.send();
 
 		expect(response.status).toBe(400);
@@ -234,7 +234,7 @@ describe("Account Activation", () => {
 		const token = "this-token-does-not-exist";
 
 		let response = await request(app)
-			.post("/users/token/" + token)
+			.post("/api/v1/users/token/" + token)
 			.send();
 
 		expect(response.body.message).toBe(

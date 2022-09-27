@@ -26,11 +26,11 @@ const postClass = async (body = classBody, options = {}) => {
 	let agent = request(app);
 	let token;
 	if (options.auth) {
-		const response = await agent.post("/users/login").send(options.auth);
+		const response = await agent.post("/api/v1/users/login").send(options.auth);
 		token = response.body.token;
 	}
 
-	agent = request(app).post("/classes/create-class");
+	agent = request(app).post("/api/v1/classes/create-class");
 
 	if (token) {
 		agent.set("Cookie", [`token=${token}`]);

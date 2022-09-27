@@ -24,8 +24,8 @@ if (process.env.NODE_ENV != "test" && process.env.NODE_ENV != "staging") {
 }
 
 // Route Handlers
-app.use("/users", require("./Routes/userRoute"));
-app.use("/classes", require("./Routes/classRoute"));
+app.use("/api/v1/users", require("./Routes/userRoute"));
+app.use("/api/v1/classes", require("./Routes/classRoute"));
 
 // Error Handling
 app.all("*", (req, res, next) => {

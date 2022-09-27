@@ -19,14 +19,16 @@ beforeEach(async () => {
 const auth = async (options = {}) => {
 	let token;
 	if (options.auth) {
-		const respone = await request(app).post("/users/login").send(options.auth);
+		const respone = await request(app)
+			.post("/api/v1/users/login")
+			.send(options.auth);
 		token = respone.body.token;
 	}
 	return token;
 };
 
 const deleteUser = async (id = 5, options = {}) => {
-	let agent = request(app).delete("/users/" + id);
+	let agent = request(app).delete("/api/v1/users/" + id);
 
 	if (options.token) {
 		agent.set("Cookie", [`token=${options.token}`]);
@@ -136,7 +138,7 @@ describe("User Delete", () => {
 			auth: credentials,
 		});
 		await request(app)
-			.post("/classes/create-class")
+			.post("/api/v1/classes/create-class")
 			.set("Authorization", token)
 			.send({
 				class_name: "computer science",

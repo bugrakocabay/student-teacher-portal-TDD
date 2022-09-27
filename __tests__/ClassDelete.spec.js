@@ -19,14 +19,16 @@ beforeEach(async () => {
 const auth = async (options = {}) => {
 	let token;
 	if (options.auth) {
-		const respone = await request(app).post("/users/login").send(options.auth);
+		const respone = await request(app)
+			.post("/api/v1/users/login")
+			.send(options.auth);
 		token = respone.body.token;
 	}
 	return token;
 };
 
 const deleteClass = async (id = 5, options = {}) => {
-	let agent = request(app).delete("/classes/" + id);
+	let agent = request(app).delete("/api/v1/classes/" + id);
 
 	if (options.token) {
 		agent.set("Cookie", [`token=${options.token}`]);

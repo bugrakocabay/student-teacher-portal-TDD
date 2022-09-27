@@ -29,11 +29,11 @@ const addUser = async (user = { ...activeUser }) => {
 };
 
 const postAuthentication = async (credentials) => {
-	return await request(app).post("/users/login").send(credentials);
+	return await request(app).post("/api/v1/users/login").send(credentials);
 };
 
 const postLogout = (options = {}) => {
-	const agent = request(app).post("/users/logout");
+	const agent = request(app).post("/api/v1/users/logout");
 	if (options.token) {
 		agent.set("Authorization", options.token);
 	}
@@ -160,7 +160,7 @@ describe("Token Expiration", () => {
 	const putUser = async (id = 5, body = null, options = {}) => {
 		let agent = request(app);
 
-		agent = request(app).put("/users/" + id);
+		agent = request(app).put("/api/v1/users/" + id);
 		if (options.token) {
 			agent.set("Authorization", options.token);
 		}
