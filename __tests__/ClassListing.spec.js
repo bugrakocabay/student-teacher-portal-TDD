@@ -45,10 +45,10 @@ const getClasses = async (options = {}) => {
 		agent = request(app).get(`/classes/`);
 	}
 	if (token) {
-		agent.set("Authorization", token);
+		agent.set("Cookie", [`token=${token}`]);
 	}
 	if (options.token) {
-		agent.set("Authorization", options.token);
+		agent.set("Cookie", [`token=${options.token}`]);
 	}
 
 	return agent;
@@ -64,7 +64,7 @@ const getSingleClass = async (id = 5, options = {}) => {
 	agent = request(app).get(`/classes/${id}`).send();
 
 	if (token) {
-		agent.set("Authorization", token);
+		agent.set("Cookie", [`token=${token}`]);
 	}
 
 	return agent;

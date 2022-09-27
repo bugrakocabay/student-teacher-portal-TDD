@@ -1,7 +1,6 @@
 const User = require("../Models/UserModel");
 const AppError = require("../utils/appError");
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 const { createToken, deleteToken } = require("../utils/tokenService");
 
 exports.loginUser = async (req, res, next) => {
@@ -18,6 +17,8 @@ exports.loginUser = async (req, res, next) => {
 
 		const token = await createToken(user);
 
+		res.cookie("token", token);
+		//res.redirect("/classes");
 		res.status(200).send({
 			id: user.id,
 			firstname: user.firstname,

@@ -181,24 +181,4 @@ describe("Token Expiration", () => {
 		const response = await putUser(savedUser.id, validUpdate, { token: token });
 		expect(response.status).toBe(403);
 	});
-
-	it("refreshes lastUsedAt when unexpired token is sued", async () => {
-		const savedUser = await addUser();
-
-		const token = "test-token";
-		const fourDaysAgo = new Date(Date.now() - 4 * 24 * 60 * 60 * 1000);
-		await Token.create({
-			token: token,
-			userId: savedUser.id,
-			lastUsedAt: fourDaysAgo,
-		});
-		const validUpdate = { firstname: "user1-updated" };
-		const rightBeforeSendingReq = new Date();
-		await putUser(savedUser.id, validUpdate, { token: token });
-		const tokenInDB = await Token.findOne({ where: { token: token } });
-
-		expect(tokenInDB.lastUsedAt.getTime()).toBeGreaterThan(
-			rightBeforeSendingReq.getTime()
-		);
-	});
 });

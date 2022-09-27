@@ -29,7 +29,7 @@ const deleteUser = async (id = 5, options = {}) => {
 	let agent = request(app).delete("/users/" + id);
 
 	if (options.token) {
-		agent.set("Authorization", options.token);
+		agent.set("Cookie", [`token=${options.token}`]);
 	}
 
 	return agent.send();

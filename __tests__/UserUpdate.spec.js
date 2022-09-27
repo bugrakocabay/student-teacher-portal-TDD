@@ -23,12 +23,11 @@ const putUser = async (id = 5, body = null, options = {}) => {
 	}
 
 	agent = request(app).put("/users/" + id);
-
 	if (token) {
-		agent.set("Authorization", token);
+		agent.set("Cookie", [`token=${token}`]);
 	}
 	if (options.token) {
-		agent.set("Authorization", options.token);
+		agent.set("Cookie", [`token=${options.token}`]);
 	}
 
 	return agent.send(body);

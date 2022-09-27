@@ -61,10 +61,10 @@ const updateClass = async (id = 5, body = updateClassBody, options = {}) => {
 		.send(body);
 
 	if (token) {
-		agent.set("Authorization", token);
+		agent.set("Cookie", [`token=${token}`]);
 	}
 	if (options.token) {
-		agent.set("Authorization", options.token);
+		agent.set("Cookie", [`token=${options.token}`]);
 	}
 
 	return agent;

@@ -1,6 +1,8 @@
 // Dependencies
 const express = require("express");
 const path = require("path");
+const cookieParser = require("cookie-parser");
+
 require("dotenv").config();
 
 // Imports
@@ -11,6 +13,7 @@ const morganLogger = require("./utils/morganLogger");
 const app = express();
 
 // Middleware
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname));
