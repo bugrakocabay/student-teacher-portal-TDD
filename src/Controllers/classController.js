@@ -8,39 +8,39 @@ const User = require("../Models/UserModel");
  * Create class in db with the object, if it is success, return 200. Unless, return 400 bad request.
  */
 exports.createClass = async (req, res, next) => {
-	try {
-		if (req.authenticatedUser) {
-			const teacher = await User.findOne({
-				where: { id: req.authenticatedUser.id },
-			});
+  try {
+    if (req.authenticatedUser) {
+      const teacher = await User.findOne({
+        where: { id: req.authenticatedUser.id },
+      });
 
-			if (teacher.role === "student") {
-				return next(new AppError("Unauthorized", 403));
-			}
-			const { class_name, date } = req.body;
-			let newClassObj = {
-				class_name,
-				date,
-				teacher: `${teacher.firstname} ${teacher.lastname}`,
-				userId: teacher.id,
-			};
+      if (teacher.role === "student") {
+        return next(new AppError("Unauthorized", 403));
+      }
+      const { class_name, date } = req.body;
+      let newClassObj = {
+        class_name,
+        date,
+        teacher: `${teacher.firstname} ${teacher.lastname}`,
+        userId: teacher.id,
+      };
 
-			try {
-				const newClass = await Class.create(newClassObj);
+      try {
+        const newClass = await Class.create(newClassObj);
 
-				return res
-					.status(200)
-					.send({ status: "success", message: "class created" });
-			} catch (error) {
-				return next(new AppError(error.errors[0].message, 400));
-			}
-		}
+        return res
+          .status(200)
+          .send({ status: "success", message: "class created" });
+      } catch (error) {
+        return next(new AppError(error.errors[0].message, 400));
+      }
+    }
 
-		return next(new AppError("Unauthorized", 401));
-	} catch (error) {
-		console.log(`CREATE CLASS ERROR ${error}`);
-		next(error);
-	}
+    return next(new AppError("Unauthorized", 401));
+  } catch (error) {
+    console.log(`CREATE CLASS ERROR ${error}`);
+    next(error);
+  }
 };
 
 /*
@@ -49,50 +49,56 @@ exports.createClass = async (req, res, next) => {
  * Return all to user with pages of 10.
  */
 exports.getClasses = async (req, res, next) => {
-	try {
-		if (req.authenticatedUser) {
-			const pageSize = 10;
-			let page = req.query.page ? Number.parseInt(req.query.page) : 0;
-			if (page < 0) page = 0;
+  const pageSize = 10;
+  let page = req.query.page ? Number.parseInt(req.query.page) : 0;
+  if (page < 0) page = 0;
 
-			const classes = await Class.findAndCountAll({
-				attributes: ["id", "class_name", "date", "teacher", "status"],
-				limit: pageSize,
-				offset: page * pageSize,
-			});
+  const classes = await Class.findAndCountAll({
+    attributes: ["id", "class_name", "date", "teacher", "status"],
+    limit: pageSize,
+    offset: page * pageSize,
+  });
 
-			res.send({
-				content: classes.rows,
-				page,
-				size: 10,
-				totalPages: Math.ceil(classes.count / pageSize),
-			});
-		} else {
-			return next(new AppError("Unauthorized", 401));
-		}
-	} catch (error) {
-		console.log("GET ALL CLASSES ERROR " + error);
-		next(error);
-	}
+  res.render("main", {
+    content: classes.rows,
+    page,
+    size: 10,
+    totalPages: Math.ceil(classes.count / pageSize),
+  }); /*
+  try {
+    if (req.authenticatedUser) {
+      // res.send({
+      // 	content: classes.rows,
+      // 	page,
+      // 	size: 10,
+      // 	totalPages: Math.ceil(classes.count / pageSize),
+      // });
+    } else {
+      return next(new AppError("Unauthorized", 401));
+    }
+  } catch (error) {
+    console.log("GET ALL CLASSES ERROR " + error);
+    next(error);
+  }*/
 };
 
 exports.getSingleClass = async (req, res, next) => {
-	try {
-		if (req.authenticatedUser) {
-			const singleClass = await Class.findOne({
-				where: { id: req.params.id },
-				attributes: ["id", "class_name", "date", "teacher", "status"],
-			});
-			if (!singleClass) return next(new AppError("Can't find this class", 404));
+  try {
+    if (req.authenticatedUser) {
+      const singleClass = await Class.findOne({
+        where: { id: req.params.id },
+        attributes: ["id", "class_name", "date", "teacher", "status"],
+      });
+      if (!singleClass) return next(new AppError("Can't find this class", 404));
 
-			res.send(singleClass);
-		} else {
-			return next(new AppError("Unauthorized", 401));
-		}
-	} catch (error) {
-		console.log("GET SINGLE CLASS ERROR " + error);
-		next(error);
-	}
+      res.send(singleClass);
+    } else {
+      return next(new AppError("Unauthorized", 401));
+    }
+  } catch (error) {
+    console.log("GET SINGLE CLASS ERROR " + error);
+    next(error);
+  }
 };
 
 /*
@@ -101,40 +107,40 @@ exports.getSingleClass = async (req, res, next) => {
  * Delete class from db and send 200 response.
  */
 exports.deleteClass = async (req, res, next) => {
-	try {
-		if (req.authenticatedUser) {
-			const teacher = await User.findOne({
-				where: { id: req.authenticatedUser.id },
-			});
+  try {
+    if (req.authenticatedUser) {
+      const teacher = await User.findOne({
+        where: { id: req.authenticatedUser.id },
+      });
 
-			if (teacher.role === "student") {
-				return next(new AppError("Unauthorized", 403));
-			}
-			try {
-				let classToDelete = await Class.findOne({
-					where: { id: req.params.id },
-				});
-				if (!classToDelete)
-					return next(new AppError("Can't find this class", 404));
+      if (teacher.role === "student") {
+        return next(new AppError("Unauthorized", 403));
+      }
+      try {
+        let classToDelete = await Class.findOne({
+          where: { id: req.params.id },
+        });
+        if (!classToDelete)
+          return next(new AppError("Can't find this class", 404));
 
-				if (classToDelete.userId !== teacher.id) {
-					return next(new AppError("Unauthorized", 403));
-				}
+        if (classToDelete.userId !== teacher.id) {
+          return next(new AppError("Unauthorized", 403));
+        }
 
-				await Class.destroy({ where: { id: req.params.id } });
-				return res
-					.status(200)
-					.send({ status: "success", message: "Class deleted" });
-			} catch (error) {
-				console.log(error);
-			}
-		} else {
-			return next(new AppError("Unauthorized", 401));
-		}
-	} catch (error) {
-		console.log("DELETE CLASS ERROR " + error);
-		next(error);
-	}
+        await Class.destroy({ where: { id: req.params.id } });
+        return res
+          .status(200)
+          .send({ status: "success", message: "Class deleted" });
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      return next(new AppError("Unauthorized", 401));
+    }
+  } catch (error) {
+    console.log("DELETE CLASS ERROR " + error);
+    next(error);
+  }
 };
 
 /*
@@ -143,43 +149,43 @@ exports.deleteClass = async (req, res, next) => {
  * Set the attributes and save it, if they pass validations return 200 success, otherwise return 400.
  */
 exports.updateClass = async (req, res, next) => {
-	try {
-		if (!req.authenticatedUser) {
-			return next(new AppError("Unauthorized", 401));
-		}
+  try {
+    if (!req.authenticatedUser) {
+      return next(new AppError("Unauthorized", 401));
+    }
 
-		const teacher = await User.findOne({
-			where: { id: req.authenticatedUser.id },
-		});
+    const teacher = await User.findOne({
+      where: { id: req.authenticatedUser.id },
+    });
 
-		if (teacher.role === "student") {
-			return next(new AppError("Unauthorized", 403));
-		}
+    if (teacher.role === "student") {
+      return next(new AppError("Unauthorized", 403));
+    }
 
-		try {
-			const { class_name, date, status } = req.body;
+    try {
+      const { class_name, date, status } = req.body;
 
-			let classToUpdate = await Class.findOne({
-				where: { id: req.params.id },
-			});
-			if (!classToUpdate)
-				return next(new AppError("Can't find this class", 404));
-			if (classToUpdate.userId !== teacher.id)
-				return next(new AppError("Unauthorized", 403));
+      let classToUpdate = await Class.findOne({
+        where: { id: req.params.id },
+      });
+      if (!classToUpdate)
+        return next(new AppError("Can't find this class", 404));
+      if (classToUpdate.userId !== teacher.id)
+        return next(new AppError("Unauthorized", 403));
 
-			classToUpdate.class_name = class_name;
-			classToUpdate.date = date;
-			classToUpdate.status = status;
-			await classToUpdate.save();
+      classToUpdate.class_name = class_name;
+      classToUpdate.date = date;
+      classToUpdate.status = status;
+      await classToUpdate.save();
 
-			return res.send({ status: "success", message: "Updated successfully" });
-		} catch (error) {
-			return next(new AppError(error.errors[0].message, 400));
-		}
-	} catch (error) {
-		console.log("UPDATE CLASS ERROR " + error);
-		next(error);
-	}
+      return res.send({ status: "success", message: "Updated successfully" });
+    } catch (error) {
+      return next(new AppError(error.errors[0].message, 400));
+    }
+  } catch (error) {
+    console.log("UPDATE CLASS ERROR " + error);
+    next(error);
+  }
 };
 
 /*const makeClass = async (num) => {
