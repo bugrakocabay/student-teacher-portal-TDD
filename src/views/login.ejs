@@ -31,14 +31,18 @@
 									<p class="text-white-50 mb-5">
 										Please enter your email and password!
 									</p>
-									<% if(message.length > 0) {%>
-									<div class="alert alert-success">
-										<%= message %> 
-									</div>		
-									<% } else if (error.length > 0) {%>
+									<% if (typeof errors != 'undefined') { %> 
 										<div class="alert alert-danger">
-											<%= error %> 
-										</div>
+											<%= errors[0].message %>
+										</div>		
+									<% } %>
+									<% try { %>
+										<% if(message.length > 0) { %>
+											<div class="alert alert-success">
+												<%= message %>
+											</div>	
+										<% } %>
+									<% } catch (err) { %>
 									<% } %>
 									<form action="/users/login" method="post">
 
@@ -81,7 +85,7 @@
 									</div>
 									<div>
 									</form>
-
+									
 									<p class="mb-0">
 										Don't have an account?
 										<a href="/users/register" class="text-white-50 fw-bold"

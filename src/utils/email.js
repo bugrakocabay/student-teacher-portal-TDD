@@ -7,11 +7,11 @@ const mailConfig = config.get("mail");
  */
 const transporter = nodemailer.createTransport(mailConfig);
 const sendAccountActivation = async (email, token) => {
-	const info = await transporter.sendMail({
-		from: "buttersx300@hotmail.com.tr",
-		to: email,
-		subject: "Account activation",
-		html: `
+  const info = await transporter.sendMail({
+    from: "sisifososman@yandex.com",
+    to: email,
+    subject: "Account activation",
+    html: `
 		<!DOCTYPE html>
 <html>
 	<head>
@@ -312,7 +312,7 @@ const sendAccountActivation = async (email, token) => {
 </html>
 
 		`,
-	});
+  });
 };
 
 module.exports = { sendAccountActivation };
