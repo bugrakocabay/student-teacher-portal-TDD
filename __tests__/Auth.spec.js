@@ -29,11 +29,11 @@ const addUser = async (user = { ...activeUser }) => {
 };
 
 const postAuthentication = async (credentials) => {
-	return await request(app).post("/users/login").send(credentials);
+	return await request(app).post("/api/v1/users/login").send(credentials);
 };
 
 const postLogout = (options = {}) => {
-	const agent = request(app).post("/users/logout");
+	const agent = request(app).post("/api/v1/users/logout");
 	if (options.token) {
 		agent.set("Authorization", options.token);
 	}
@@ -160,7 +160,7 @@ describe("Token Expiration", () => {
 	const putUser = async (id = 5, body = null, options = {}) => {
 		let agent = request(app);
 
-		agent = request(app).put("/users/" + id);
+		agent = request(app).put("/api/v1/users/" + id);
 		if (options.token) {
 			agent.set("Authorization", options.token);
 		}
@@ -180,25 +180,5 @@ describe("Token Expiration", () => {
 		const validUpdate = { firstname: "user1-updated" };
 		const response = await putUser(savedUser.id, validUpdate, { token: token });
 		expect(response.status).toBe(403);
-	});
-
-	it("refreshes lastUsedAt when unexpired token is sued", async () => {
-		const savedUser = await addUser();
-
-		const token = "test-token";
-		const fourDaysAgo = new Date(Date.now() - 4 * 24 * 60 * 60 * 1000);
-		await Token.create({
-			token: token,
-			userId: savedUser.id,
-			lastUsedAt: fourDaysAgo,
-		});
-		const validUpdate = { firstname: "user1-updated" };
-		const rightBeforeSendingReq = new Date();
-		await putUser(savedUser.id, validUpdate, { token: token });
-		const tokenInDB = await Token.findOne({ where: { token: token } });
-
-		expect(tokenInDB.lastUsedAt.getTime()).toBeGreaterThan(
-			rightBeforeSendingReq.getTime()
-		);
 	});
 });

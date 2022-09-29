@@ -1,10 +1,16 @@
 const { verify } = require("../utils/tokenService");
 
+/*
+ *  Get token from cookie, if it exists, verify it. Then authenticate user.
+ */
 const tokenAuth = async (req, res, next) => {
-	const authorization = req.headers.authorization; // get token from auth header
+	const authorization = req.cookies.token; //
+
 	if (authorization) {
 		try {
-			let user = await verify(authorization);
+			//const token = authorization.substring(7);
+			const user = await verify(authorization);
+
 			req.authenticatedUser = user;
 		} catch (error) {}
 	}

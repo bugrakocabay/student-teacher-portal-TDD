@@ -15,14 +15,14 @@ beforeEach(async () => {
 
 describe("Listing Users", () => {
 	it("returns 200 ok when there are user in database", async () => {
-		const response = await request(app).get("/users");
+		const response = await request(app).get("/api/v1/users");
 		expect(response.status).toBe(200);
 	});
 });
 
 describe("Get User", () => {
 	const getUser = (id = 5) => {
-		return request(app).get("/users/" + id);
+		return request(app).get("/api/v1/users/" + id);
 	};
 
 	it("returns 404 when user not found", async () => {

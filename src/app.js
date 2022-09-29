@@ -1,6 +1,8 @@
 // Dependencies
 const express = require("express");
 const path = require("path");
+const cookieParser = require("cookie-parser");
+
 require("dotenv").config();
 
 // Imports
@@ -11,6 +13,7 @@ const morganLogger = require("./utils/morganLogger");
 const app = express();
 
 // Middleware
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname));
@@ -20,9 +23,13 @@ if (process.env.NODE_ENV != "test" && process.env.NODE_ENV != "staging") {
 	app.use(morganLogger);
 }
 
-// Route Handlers
-app.use("/users", require("./Routes/userRoute"));
-app.use("/classes", require("./Routes/classRoute"));
+// API Route Handlers
+app.use("/api/v1/users", require("./Routes/userRoute"));
+app.use("/api/v1/classes", require("./Routes/classRoute"));
+
+// Views Route Handlers
+app.use("/users", require("./Routes/viewsUserRoute"));
+app.use("/classes", require("./Routes/viewsClassRoute"));
 
 // Error Handling
 app.all("*", (req, res, next) => {

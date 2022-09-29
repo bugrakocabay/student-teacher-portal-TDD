@@ -4,6 +4,10 @@ const emailService = require("../utils/email");
 const AppError = require("../utils/appError");
 const { randomString } = require("../utils/generator");
 
+/*
+ *  Destructure request body, return error if there are any empty fields. Store input in a object with hashed password.
+ * 	Send an activation mail, with a randomly generated token. If inputs pass the validation, create user and send 200.
+ */
 exports.createUser = async (req, res, next) => {
 	try {
 		const { firstname, lastname, email, password, role } = req.body;
@@ -35,16 +39,19 @@ exports.createUser = async (req, res, next) => {
 	}
 };
 
+/*
+ *  Get token from request parameters(url was sent via activation mail). Find user in db, if doesn't exist, return error.
+ *  Update user status to "active" and delete token, then save it. Send 200 with message.
+ */
 exports.activateAccount = async (req, res, next) => {
 	const token = req.params.token;
 	try {
 		const user = await User.findOne({ where: { activationToken: token } });
 		if (!user)
-			// if cant find token return error
 			return next(
 				new AppError("account is either active or the token is invalid", 400)
 			);
-		user.inactive = false; // user status is active now
+		user.inactive = false;
 		user.activationToken = null; // delete activationToken from db
 		await user.save(); //save all
 		return res
@@ -55,6 +62,9 @@ exports.activateAccount = async (req, res, next) => {
 	}
 };
 
+/*
+ *  Get all users from db, if exist. Send users in response body with 200.
+ */
 exports.getUsers = async (req, res, next) => {
 	try {
 		let users = await User.findAll();
@@ -65,6 +75,9 @@ exports.getUsers = async (req, res, next) => {
 	}
 };
 
+/*
+ *  Get user with id, given in request parameter if exists. Return only selected attributes from db.
+ */
 exports.getSingleUser = async (req, res, next) => {
 	try {
 		let user = await User.findOne({
@@ -111,7 +124,6 @@ exports.updateUser = async (req, res, next) => {
 	ids don't match with request parameter's, send 403 error. 
 	If it is, get the user in db, destroy it and the tokens of the.
 */
-
 exports.deleteUser = async (req, res, next) => {
 	const authenticatedUser = req.authenticatedUser;
 	try {

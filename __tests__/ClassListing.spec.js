@@ -36,19 +36,21 @@ const getClasses = async (options = {}) => {
 	let agent = request(app);
 	let token;
 	if (options.auth) {
-		const response = await agent.post(`/users/login/`).send(options.auth);
+		const response = await agent
+			.post(`/api/v1/users/login/`)
+			.send(options.auth);
 		token = response.body.token;
 	}
 	if (options.query) {
-		agent = request(app).get(`/classes?${options.query}`);
+		agent = request(app).get(`/api/v1/classes?${options.query}`);
 	} else {
-		agent = request(app).get(`/classes/`);
+		agent = request(app).get(`/api/v1/classes/`);
 	}
 	if (token) {
-		agent.set("Authorization", token);
+		agent.set("Cookie", [`token=${token}`]);
 	}
 	if (options.token) {
-		agent.set("Authorization", options.token);
+		agent.set("Cookie", [`token=${options.token}`]);
 	}
 
 	return agent;
@@ -58,13 +60,15 @@ const getSingleClass = async (id = 5, options = {}) => {
 	let agent = request(app);
 	let token;
 	if (options.auth) {
-		const response = await agent.post(`/users/login/`).send(options.auth);
+		const response = await agent
+			.post(`/api/v1/users/login/`)
+			.send(options.auth);
 		token = response.body.token;
 	}
-	agent = request(app).get(`/classes/${id}`).send();
+	agent = request(app).get(`/api/v1/classes/${id}`).send();
 
 	if (token) {
-		agent.set("Authorization", token);
+		agent.set("Cookie", [`token=${token}`]);
 	}
 
 	return agent;
