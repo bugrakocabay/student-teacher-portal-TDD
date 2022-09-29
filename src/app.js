@@ -23,9 +23,13 @@ if (process.env.NODE_ENV != "test" && process.env.NODE_ENV != "staging") {
 	app.use(morganLogger);
 }
 
-// Route Handlers
+// API Route Handlers
 app.use("/api/v1/users", require("./Routes/userRoute"));
 app.use("/api/v1/classes", require("./Routes/classRoute"));
+
+// Views Route Handlers
+app.use("/users", require("./Routes/viewsUserRoute"));
+app.use("/classes", require("./Routes/viewsClassRoute"));
 
 // Error Handling
 app.all("*", (req, res, next) => {

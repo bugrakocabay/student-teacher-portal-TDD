@@ -1,10 +1,11 @@
 const nodemailer = require("nodemailer");
 const config = require("config");
-const logger = require("./logger");
 const mailConfig = config.get("mail");
 
+/*
+ *  Sends user an activation mail, with a nice HTML page.
+ */
 const transporter = nodemailer.createTransport(mailConfig);
-
 const sendAccountActivation = async (email, token) => {
 	const info = await transporter.sendMail({
 		from: "buttersx300@hotmail.com.tr",

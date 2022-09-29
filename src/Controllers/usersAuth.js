@@ -3,6 +3,10 @@ const AppError = require("../utils/appError");
 const bcrypt = require("bcryptjs");
 const { createToken, deleteToken } = require("../utils/tokenService");
 
+/*
+ *  Destructure request body, check; 1) if user exists, 2) password is correct, 3) user active. Create token if all requirements are met.
+ *  Store token in client cookie and 200.
+ */
 exports.loginUser = async (req, res, next) => {
 	try {
 		const { email, password } = req.body;
@@ -18,7 +22,7 @@ exports.loginUser = async (req, res, next) => {
 		const token = await createToken(user);
 
 		res.cookie("token", token);
-		//res.redirect("/classes");
+
 		res.status(200).send({
 			id: user.id,
 			firstname: user.firstname,
