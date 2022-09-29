@@ -1,7 +1,6 @@
 const AppError = require("../utils/appError");
 const Class = require("../Models/ClassModel");
 const User = require("../Models/UserModel");
-const app = require("../app");
 
 /*
  * Check if user is authenticated >> find authenticated users info in db >> if user is a "student" return Unauthorized,

@@ -11,4 +11,6 @@ router
 	.get(viewsController.registerRender)
 	.post(viewsController.createUser);
 
+router.route("/logout").get(viewsController.logoutUser);
+
 module.exports = router;

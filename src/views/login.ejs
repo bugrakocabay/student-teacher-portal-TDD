@@ -31,7 +31,15 @@
 									<p class="text-white-50 mb-5">
 										Please enter your email and password!
 									</p>
-
+									<% if(message.length > 0) {%>
+									<div class="alert alert-success">
+										<%= message %> 
+									</div>		
+									<% } else if (error.length > 0) {%>
+										<div class="alert alert-danger">
+											<%= error %> 
+										</div>
+									<% } %>
 									<form action="/users/login" method="post">
 
 										<div class="form-outline form-white mb-4">

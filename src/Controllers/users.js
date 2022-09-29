@@ -15,19 +15,22 @@ exports.createUser = async (req, res, next) => {
 		if (!email) return next(new AppError("email cannot be null", 400));
 
 		let hashedpassword = await bcrypt.hash(password, 10); // hash password
+		let formattedMail = email.replace(/\s+/g, "").toLowerCase();
+
 		let user = {
 			// update password and generate mail token on request body
 			firstname,
 			lastname,
-			email,
+			email: formattedMail,
 			password: hashedpassword,
 			role,
 			activationToken: randomString(16),
 		};
-		await emailService.sendAccountActivation(email, user.activationToken);
 
 		try {
 			let createdUser = await User.create(user); // save user to db
+			await emailService.sendAccountActivation(email, user.activationToken);
+
 			return res.status(200).send({ message: "User created" });
 		} catch (error) {
 			//console.log(error);

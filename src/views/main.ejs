@@ -57,7 +57,7 @@
 					<li>+----</li>
 
 					<li>
-						<a href="#" class="nav-link link-light">
+						<a href="/users/logout" class="nav-link link-light">
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
 								width="16"
@@ -92,8 +92,8 @@
 							<!-- Icons -->
 							<ul class="navbar-nav d-flex flex-row me-1">
 								<li class="nav-item me-5 me-lg-0">
-									<a class="nav-link" href="#">
-										User Name
+									<a class="nav-link" id="userName" href="#">
+										<%= user.firstname %> <%= user.lastname %>
 										<svg
 											xmlns="http://www.w3.org/2000/svg"
 											width="16"
@@ -129,45 +129,13 @@
 								<th>Actions</th>
 							</tr>
 						</thead>
-						<tbody>
-							<tr>
-								<td>1</td>
-								<td>
-									<div class="d-flex align-items-center">
-										<img
-											src="https://mdbootstrap.com/img/new/avatars/8.jpg"
-											alt=""
-											style="width: 45px; height: 45px"
-											class="rounded-circle"
-										/>
-										<div class="ms-3">
-											<p class="fw-bold mb-1">John Doe</p>
-											<p class="text-muted mb-0">john.doe@gmail.com</p>
-										</div>
-									</div>
-								</td>
-								<td>
-									<p class="fw-normal mb-1">Software engineer</p>
-									<p class="text-muted mb-0">IT department</p>
-								</td>
-								<td>
-									<span class="badge badge-success rounded-pill d-inline"
-										>Active</span
-									>
-								</td>
-								<td>Senior</td>
-								<td>
-									<button type="button" class="btn btn-link btn-sm btn-rounded">
-										Edit
-									</button>
-								</td>
-							</tr>
-						</tbody>
+						<tbody id="myTable"></tbody>
 					</table>
 				</div>
 			</div>
 		</div>
 
+		<script src="../views/main.js"></script>
 		<script
 			src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"
 			integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8"

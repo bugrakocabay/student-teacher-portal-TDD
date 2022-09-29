@@ -51,6 +51,10 @@ module.exports = {
 					},
 				},
 			},
+			role: {
+				type: Sequelize.ENUM("student", "teacher", "admin"),
+				defaultValue: "student",
+			},
 			inactive: {
 				type: Sequelize.BOOLEAN,
 				defaultValue: true,

@@ -226,7 +226,7 @@ const sendAccountActivation = async (email, token) => {
 														style="border-radius: 6px"
 													>
 														<form
-															action="http://localhost:3000/users/token/${token}"
+															action="http://localhost:3000/api/v1/users/token/${token}"
 															method="post"
 														>
 															<button

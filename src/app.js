@@ -2,6 +2,8 @@
 const express = require("express");
 const path = require("path");
 const cookieParser = require("cookie-parser");
+const flash = require("connect-flash");
+const session = require("express-session");
 
 require("dotenv").config();
 
@@ -13,12 +15,21 @@ const morganLogger = require("./utils/morganLogger");
 const app = express();
 
 // Middleware
-app.use(cookieParser());
+app.use(flash());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname));
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
+app.use(cookieParser("NotSoSecret"));
+app.use(
+	session({
+		secret: "something",
+		cookie: { maxAge: 60000 },
+		resave: true,
+		saveUninitialized: true,
+	})
+);
 if (process.env.NODE_ENV != "test" && process.env.NODE_ENV != "staging") {
 	app.use(morganLogger);
 }

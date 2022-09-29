@@ -6,15 +6,20 @@ const emailService = require("../utils/email");
 const { randomString } = require("../utils/generator");
 
 exports.loginRender = async (req, res, next) => {
-	res.render("login.ejs");
+	res.render("login", {
+		error: req.flash("error"),
+		message: req.flash("message"),
+	});
 };
 
 exports.registerRender = async (req, res, next) => {
-	res.render("register.ejs");
+	res.render("register.ejs", { error: req.flash("error") });
 };
 
 exports.mainRender = async (req, res, next) => {
-	res.render("main.ejs");
+	let user = await User.findOne({ where: { id: req.authenticatedUser.id } });
+
+	res.render("main.ejs", { user: user });
 };
 
 /*
@@ -25,10 +30,16 @@ exports.loginUser = async (req, res, next) => {
 	try {
 		const { email, password } = req.body;
 		const user = await User.findOne({ where: { email: email } });
-		if (!user) return next(new AppError("Incorrect credentials", 401)); // user doesnt exist
+		if (!user) {
+			req.flash("error", "Incorrect credentials");
+			res.render("login");
+		} // user doesnt exist
 
 		const match = await bcrypt.compare(password, user.password);
-		if (!match) return next(new AppError("Incorrect credentials", 401)); // wrong password
+		if (!match) {
+			req.flash("error", "Incorrect credentials");
+			res.render("login");
+		} // wrong password
 
 		if (user.inactive)
 			return next(new AppError("Please activate your account", 403));
@@ -53,26 +64,39 @@ exports.createUser = async (req, res, next) => {
 		if (!email) return next(new AppError("email cannot be null", 400));
 
 		let hashedpassword = await bcrypt.hash(password, 10); // hash password
+		let formattedMail = email.replace(/\s+/g, "").toLowerCase();
+
 		let user = {
 			// update password and generate mail token on request body
 			firstname,
 			lastname,
-			email,
+			email: formattedMail,
 			password: hashedpassword,
 			role,
 			activationToken: randomString(16),
 		};
-		await emailService.sendAccountActivation(email, user.activationToken);
 
 		try {
-			let createdUser = await User.create(user); // save user to db
+			let createdUser = await User.create(user);
+			await emailService.sendAccountActivation(email, user.activationToken);
+			req.flash(
+				"message",
+				"Registration successful, an activation mail has been sent to your email."
+			);
 			return res.redirect("/users/login");
 		} catch (error) {
 			//console.log(error);
-			return next(new AppError(error.errors[0].message, 400));
+			req.flash("error", error.errors[0].message);
+			return res.render("register", { error: error.errors[0].message });
 		}
 	} catch (error) {
 		//console.log(error);
-		return next(new AppError("email failure", 502));
+		req.flash("error", "An error occured :(");
+		return res.render("register", { error });
 	}
+};
+
+exports.logoutUser = async (req, res, next) => {
+	res.cookie("token", " ", { maxAge: 1 });
+	res.redirect("/users/login");
 };
