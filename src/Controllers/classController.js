@@ -188,8 +188,9 @@ exports.updateClass = async (req, res, next) => {
 			class_name: `class${i + 1}`,
 			date: "2022-03-01 10:00:00",
 			teacher: `teacher${i + 1}`,
+			status: "finished",
 		});
 	}
 };
 
-makeClass(25);*/
+makeClass(5);*/
