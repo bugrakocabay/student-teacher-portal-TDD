@@ -12,5 +12,6 @@ router
 	.post(viewsController.createUser);
 
 router.route("/logout").get(viewsController.logoutUser);
+router.route("/token/:token").get(viewsController.activationSuccess);
 
 module.exports = router;

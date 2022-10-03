@@ -8,7 +8,7 @@ const router = express.Router();
 router.route("/login").post(usersAuthController.loginUser);
 router.route("/logout").post(usersAuthController.logoutUser);
 router.route("/register").post(userController.createUser);
-router.route("/token/:token").post(userController.activateAccount);
+router.route("/token/:token").get(userController.activateAccount);
 router.route("/").get(userController.getUsers);
 router
 	.route("/:id")

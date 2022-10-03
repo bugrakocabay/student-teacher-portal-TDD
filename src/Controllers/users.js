@@ -28,16 +28,19 @@ exports.createUser = async (req, res, next) => {
 		};
 
 		try {
-			await emailService.sendAccountActivation(email, user.activationToken);
+			await emailService.sendAccountActivation(
+				formattedMail,
+				user.activationToken
+			);
 			let createdUser = await User.create(user); // save user to db
 
 			return res.status(200).send({ message: "User created" });
 		} catch (error) {
-			console.log(error);
+			//console.log(error);
 			return next(new AppError(error.errors[0].message, 400));
 		}
 	} catch (error) {
-		console.log(error);
+		//console.log(error);
 		return next(new AppError("email failure", 502));
 	}
 };
