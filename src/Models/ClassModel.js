@@ -40,6 +40,9 @@ Class.init(
 		userId: {
 			type: Sequelize.INTEGER,
 		},
+		description: {
+			type: Sequelize.STRING(),
+		},
 	},
 	{ sequelize, modelName: "classes", timestamps: true }
 );

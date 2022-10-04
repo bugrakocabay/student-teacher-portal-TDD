@@ -3,7 +3,7 @@ const Sequelize = require("sequelize");
 const jwt = require("jsonwebtoken");
 
 const createToken = async (user) => {
-	return jwt.sign({ id: user.id }, process.env.JWTSECRET);
+	return jwt.sign({ id: user.id, role: user.role }, process.env.JWTSECRET);
 };
 
 const verify = async (token) => {

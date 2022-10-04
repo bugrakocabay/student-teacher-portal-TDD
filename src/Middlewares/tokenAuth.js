@@ -12,6 +12,7 @@ const tokenAuth = async (req, res, next) => {
 			const user = await verify(authorization);
 
 			req.authenticatedUser = user;
+			req.userRole = user.role;
 		} catch (error) {}
 	}
 	next();

@@ -1,4 +1,5 @@
 const User = require("../Models/UserModel");
+const Class = require("../Models/ClassModel");
 const AppError = require("../utils/appError");
 const bcrypt = require("bcryptjs");
 const emailService = require("../utils/email");
@@ -6,19 +7,47 @@ const { createToken } = require("../utils/tokenService");
 const { randomString } = require("../utils/generator");
 
 exports.loginRender = async (req, res, next) => {
-	res.render("login.ejs", { message: req.flash("message") });
+	try {
+		res.render("login.ejs", { message: req.flash("message") });
+	} catch (error) {
+		console.log(error);
+	}
 };
 
 exports.registerRender = async (req, res, next) => {
 	res.render("register.ejs");
 };
 
-exports.mainRender = async (req, res, next) => {
-	let user = await User.findOne({ where: { id: req.authenticatedUser.id } });
+exports.classRender = async (req, res, next) => {
+	try {
+		let user = await User.findOne({ where: { id: req.authenticatedUser.id } });
+		let myClass = await Class.findOne({ where: { id: req.params.id } });
 
-	res.render("main.ejs", { user: user });
+		res.render("class.ejs", { user: user, myClass: myClass });
+	} catch (error) {
+		console.log(error);
+	}
 };
 
+exports.mainRender = async (req, res, next) => {
+	try {
+		let user = await User.findOne({ where: { id: req.authenticatedUser.id } });
+
+		res.render("main.ejs", { user: user });
+	} catch (error) {
+		console.log(error);
+	}
+};
+
+exports.createClassPage = async (req, res, next) => {
+	try {
+		let user = await User.findOne({ where: { id: req.authenticatedUser.id } });
+
+		res.render("create-class.ejs", { user: user });
+	} catch (error) {
+		console.log(error);
+	}
+};
 /*
  *  This is a duplicate login function of the in usersAuth.js. The difference is, this one is used for client to be redirected to main page,
  *  and the other is for testing.
@@ -114,6 +143,40 @@ exports.activationSuccess = async (req, res, next) => {
 		await user.save(); //save all
 		return res.render("activationSuccess.ejs");
 	} catch (error) {
+		next(error);
+	}
+};
+
+exports.createClass = async (req, res, next) => {
+	try {
+		if (req.authenticatedUser) {
+			const teacher = await User.findOne({
+				where: { id: req.authenticatedUser.id },
+			});
+
+			if (teacher.role === "student") {
+				return next(new AppError("Unauthorized", 403));
+			}
+			const { class_name, date, description } = req.body;
+			let newClassObj = {
+				class_name,
+				date,
+				teacher: `${teacher.firstname} ${teacher.lastname}`,
+				userId: teacher.id,
+				description,
+			};
+			try {
+				const newClass = await Class.create(newClassObj);
+
+				return res.redirect("/classes");
+			} catch (error) {
+				return next(new AppError(error.errors[0].message, 400));
+			}
+		}
+
+		return next(new AppError("Unauthorized", 401));
+	} catch (error) {
+		console.log(`CREATE CLASS ERROR ${error}`);
 		next(error);
 	}
 };

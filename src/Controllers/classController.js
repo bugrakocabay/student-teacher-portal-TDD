@@ -24,7 +24,6 @@ exports.createClass = async (req, res, next) => {
 				teacher: `${teacher.firstname} ${teacher.lastname}`,
 				userId: teacher.id,
 			};
-
 			try {
 				const newClass = await Class.create(newClassObj);
 
@@ -56,7 +55,14 @@ exports.getClasses = async (req, res, next) => {
 			if (page < 0) page = 0;
 
 			const classes = await Class.findAndCountAll({
-				attributes: ["id", "class_name", "date", "teacher", "status"],
+				attributes: [
+					"id",
+					"class_name",
+					"date",
+					"teacher",
+					"status",
+					"description",
+				],
 				limit: pageSize,
 				offset: page * pageSize,
 			});
@@ -81,7 +87,14 @@ exports.getSingleClass = async (req, res, next) => {
 		if (req.authenticatedUser) {
 			const singleClass = await Class.findOne({
 				where: { id: req.params.id },
-				attributes: ["id", "class_name", "date", "teacher", "status"],
+				attributes: [
+					"id",
+					"class_name",
+					"date",
+					"teacher",
+					"status",
+					"description",
+				],
 			});
 			if (!singleClass) return next(new AppError("Can't find this class", 404));
 

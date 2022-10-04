@@ -144,6 +144,7 @@ describe("Listing Classes", () => {
 			"date",
 			"teacher",
 			"status",
+			"description",
 		]);
 	});
 
@@ -220,6 +221,7 @@ describe("Get single class", () => {
 			"date",
 			"teacher",
 			"status",
+			"description",
 		]);
 	});
 });

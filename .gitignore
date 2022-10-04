@@ -108,3 +108,6 @@ dist
 development.sqlite
 test.sqlite
 staging.sqlite
+
+.DS_Store
+.vscode

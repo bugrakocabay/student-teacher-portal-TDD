@@ -21,7 +21,7 @@
 				</header>
 				<ul class="nav">
 					<li>
-						<a href="#" class="nav-link link-light">
+						<a href="/classes" class="nav-link link-light">
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
 								width="16"
@@ -116,34 +116,23 @@
 					<!-- Container wrapper -->
 				</nav>
 				<!-- Navbar End -->
-				<div class="container-fluid">
-					<div>
-						<h2>Class List</h2>
-						<% if (user.role == "teacher") { %>
-						<a href="/classes/create-class"
-							><button
-								type="button"
-								class="btn btn-outline-success btn-sm float-end"
-							>
-								Create Class
-							</button></a
-						>
-						<% } %>
-					</div>
+				<div class="ms-2">
+					<h1 class="display-6">Class Info</h1>
+					<dl class="row">
+						<dt class="col-sm-3">Class Name</dt>
+						<dd class="col-sm-9"><%= myClass.class_name %></dd>
 
-					<table class="table align-middle mb-0 bg-transparent table-hover">
-						<thead class="bg-transparent">
-							<tr>
-								<th>ID</th>
-								<th>Class Name</th>
-								<th>Date</th>
-								<th>Status</th>
-								<th>Teacher</th>
-								<th>Actions</th>
-							</tr>
-						</thead>
-						<tbody id="myTable"></tbody>
-					</table>
+						<dt class="col-sm-3">Date</dt>
+						<dd class="col-sm-9">
+							<%= myClass.date.toLocaleString("tr-TR") %>
+						</dd>
+
+						<dt class="col-sm-3">Teacher</dt>
+						<dd class="col-sm-9"><%= myClass.teacher %></dd>
+
+						<dt class="col-sm-3 text-truncate">Description</dt>
+						<dd class="col-sm-9"><%= myClass.description %></dd>
+					</dl>
 				</div>
 			</div>
 		</div>

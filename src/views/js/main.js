@@ -15,6 +15,7 @@ async function loadIntoTable(url) {
 		let dateToFormat = new Date(content[i].date);
 		let status;
 		let actions;
+		let info = `<a class="btn btn-outline-dark" href="/classes/${content[i].id}" role="button">Info</a>`;
 
 		if (content[i].status === "pending") {
 			status = `<span class="badge rounded-pill text-bg-success">Pending</span>`;
@@ -25,13 +26,14 @@ async function loadIntoTable(url) {
 		}
 
 		let row = `<tr>
-                    <td>${content[i].id}</td>
-                    <td>${content[i].class_name}</td>
-                    <td>${dateToFormat.toLocaleString("tr-TR", options)}</td>
-                    <td>${status}</td>
-                    <td>${content[i].teacher}</td>
-                    <td>${actions}</td>
-                </tr>`;
+		<td>${content[i].id}</td>
+		<td>${content[i].class_name}</td>
+		<td>${dateToFormat.toLocaleString("tr-TR", options)}</td>
+		<td>${status}</td>
+		<td>${content[i].teacher}</td>
+		<td>${info} ${actions}</td>
+		</tr>`;
+
 		tableBody.innerHTML += row;
 	}
 }

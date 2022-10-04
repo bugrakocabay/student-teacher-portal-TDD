@@ -21,7 +21,7 @@
 				</header>
 				<ul class="nav">
 					<li>
-						<a href="#" class="nav-link link-light">
+						<a href="/classes" class="nav-link link-light">
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
 								width="16"
@@ -38,7 +38,7 @@
 						</a>
 					</li>
 					<li>
-						<a href="#" class="nav-link link-light">
+						<a href="/classes" class="nav-link link-light">
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
 								width="16"
@@ -117,38 +117,45 @@
 				</nav>
 				<!-- Navbar End -->
 				<div class="container-fluid">
-					<div>
-						<h2>Class List</h2>
-						<% if (user.role == "teacher") { %>
-						<a href="/classes/create-class"
-							><button
-								type="button"
-								class="btn btn-outline-success btn-sm float-end"
+					<h2>Create Class</h2>
+					<form action="/classes/create-class" method="post">
+						<div class="mb-3">
+							<label for="exampleInputname1" class="form-label"
+								>Class Name</label
 							>
-								Create Class
-							</button></a
-						>
-						<% } %>
-					</div>
-
-					<table class="table align-middle mb-0 bg-transparent table-hover">
-						<thead class="bg-transparent">
-							<tr>
-								<th>ID</th>
-								<th>Class Name</th>
-								<th>Date</th>
-								<th>Status</th>
-								<th>Teacher</th>
-								<th>Actions</th>
-							</tr>
-						</thead>
-						<tbody id="myTable"></tbody>
-					</table>
+							<input
+								type="text"
+								class="form-control"
+								name="class_name"
+								required
+							/>
+						</div>
+						<div class="mb-3">
+							<label for="exampleInputdate1" class="form-label">Date</label>
+							<input type="text" class="form-control" name="date" required />
+							<div id="emailHelp" class="form-text text-warning">
+								Please provide date using this format; YYYY-MM-DD HH:MM:SS
+								<br />
+								e.g 2022-11-26 16:00:00
+							</div>
+						</div>
+						<div class="mb-3">
+							<label for="exampleFormControlTextarea1" class="form-label"
+								>Description</label
+							>
+							<textarea
+								class="form-control"
+								name="description"
+								rows="3"
+							></textarea>
+						</div>
+						<button type="submit" class="btn btn-primary">Submit</button>
+					</form>
 				</div>
 			</div>
 		</div>
 
-		<script src="../views/js/main.js"></script>
+		<script src="../views/main.js"></script>
 		<script
 			src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"
 			integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8"
