@@ -41,7 +41,7 @@ Class.init(
 			type: Sequelize.INTEGER,
 		},
 		description: {
-			type: Sequelize.STRING(),
+			type: Sequelize.STRING,
 		},
 	},
 	{ sequelize, modelName: "classes", timestamps: true }

@@ -50,9 +50,9 @@ exports.createClass = async (req, res, next) => {
 exports.getClasses = async (req, res, next) => {
 	try {
 		if (req.authenticatedUser) {
-			const pageSize = 10;
+			/*const pageSize = 10;
 			let page = req.query.page ? Number.parseInt(req.query.page) : 0;
-			if (page < 0) page = 0;
+			if (page < 0) page = 0;*/
 
 			const classes = await Class.findAndCountAll({
 				attributes: [
@@ -63,15 +63,15 @@ exports.getClasses = async (req, res, next) => {
 					"status",
 					"description",
 				],
-				limit: pageSize,
-				offset: page * pageSize,
+				/*limit: pageSize,
+				offset: page * pageSize,*/
 			});
 
 			res.send({
 				content: classes.rows,
-				page,
+				/*page,
 				size: 10,
-				totalPages: Math.ceil(classes.count / pageSize),
+				totalPages: Math.ceil(classes.count / pageSize),*/
 			});
 		} else {
 			return next(new AppError("Unauthorized", 401));

@@ -92,7 +92,11 @@
 							<!-- Icons -->
 							<ul class="navbar-nav d-flex flex-row me-1">
 								<li class="nav-item me-5 me-lg-0">
-									<a class="nav-link" id="userName" href="#">
+									<a
+										class="nav-link"
+										id="userName"
+										href="/users/<%= user.id %>"
+									>
 										<%= user.firstname %> <%= user.lastname %>
 										<svg
 											xmlns="http://www.w3.org/2000/svg"
@@ -118,7 +122,7 @@
 				<!-- Navbar End -->
 				<div class="container-fluid">
 					<div>
-						<h2>Class List</h2>
+						<h1 class="display-6">Class List</h1>
 						<% if (user.role == "teacher") { %>
 						<a href="/classes/create-class"
 							><button

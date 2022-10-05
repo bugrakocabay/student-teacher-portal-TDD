@@ -48,6 +48,17 @@ exports.createClassPage = async (req, res, next) => {
 		console.log(error);
 	}
 };
+
+exports.userPageRender = async (req, res, next) => {
+	try {
+		let user = await User.findOne({ where: { id: req.authenticatedUser.id } });
+		let myClass = await Class.findOne({ where: { id: req.params.id } });
+
+		res.render("user.ejs", { user: user, myClass: myClass });
+	} catch (error) {
+		console.log(error);
+	}
+};
 /*
  *  This is a duplicate login function of the in usersAuth.js. The difference is, this one is used for client to be redirected to main page,
  *  and the other is for testing.
