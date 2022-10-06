@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const emailService = require("../utils/email");
 const AppError = require("../utils/appError");
 const { randomString } = require("../utils/generator");
+const StudentClass = require("../Models/StudentClass");
 
 /*
  *  Destructure request body, return error if there are any empty fields. Store input in a object with hashed password.
@@ -145,5 +146,18 @@ exports.deleteUser = async (req, res, next) => {
 	} catch (error) {
 		console.log(`DELETE USER ERROR ${error}`);
 		next(error);
+	}
+};
+
+exports.getStudentsClasses = async (req, res, next) => {
+	try {
+		if (!req.authenticatedUser) return next(new AppError("Unauthorized", 401));
+		let myClasses = await StudentClass.findAll({
+			where: { userId: req.authenticatedUser.id },
+		});
+
+		res.send(myClasses);
+	} catch (error) {
+		console.log(error);
 	}
 };

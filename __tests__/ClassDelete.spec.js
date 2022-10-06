@@ -63,13 +63,13 @@ const addClass = async (body = classBody) => {
 };
 
 describe("Delete Class", () => {
-	it("returns 403 when request it unauthenticated", async () => {
+	it("returns 401 when request it unauthenticated", async () => {
 		const response = await deleteClass();
 
 		expect(response.statusCode).toBe(401);
 	});
 
-	it("returns 403 when token is invalid ", async () => {
+	it("returns 401 when token is invalid ", async () => {
 		const response = await deleteClass(5, { token: "abcd" });
 
 		expect(response.statusCode).toBe(401);

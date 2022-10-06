@@ -1,5 +1,6 @@
 const User = require("../Models/UserModel");
 const Class = require("../Models/ClassModel");
+const StudentClass = require("../Models/StudentClass");
 const AppError = require("../utils/appError");
 const bcrypt = require("bcryptjs");
 const emailService = require("../utils/email");
@@ -52,7 +53,9 @@ exports.createClassPage = async (req, res, next) => {
 exports.userPageRender = async (req, res, next) => {
 	try {
 		let user = await User.findOne({ where: { id: req.authenticatedUser.id } });
-		let myClass = await Class.findOne({ where: { id: req.params.id } });
+		let myClass = await StudentClass.findAll({
+			where: { userId: req.authenticatedUser.id },
+		});
 
 		res.render("user.ejs", { user: user, myClass: myClass });
 	} catch (error) {
@@ -188,6 +191,35 @@ exports.createClass = async (req, res, next) => {
 		return next(new AppError("Unauthorized", 401));
 	} catch (error) {
 		console.log(`CREATE CLASS ERROR ${error}`);
+		next(error);
+	}
+};
+
+exports.joinClass = async (req, res, next) => {
+	try {
+		if (!req.authenticatedUser) return next(new AppError("Unauthorized", 401));
+		if (req.userRole === "teacher")
+			return next(new AppError("Teachers can't join classes", 403));
+		const find = await StudentClass.findOne({
+			where: { classId: req.params.id, userId: req.authenticatedUser.id },
+		});
+		if (find)
+			return next(new AppError("You have already joined this class", 400));
+		let oldClass = await Class.findOne({ where: { id: req.params.id } });
+
+		let newJoin = await StudentClass.create({
+			userId: req.authenticatedUser.id,
+			classId: req.params.id,
+			class_name: oldClass.class_name,
+			date: oldClass.date,
+			teacher: oldClass.teacher,
+			status: oldClass.status,
+			description: oldClass.description,
+		});
+
+		res.redirect("/classes");
+	} catch (error) {
+		console.log("JOIN CLASS ERROR " + error);
 		next(error);
 	}
 };

@@ -19,7 +19,7 @@ async function loadIntoTable(url) {
 
 		if (content[i].status === "pending") {
 			status = `<span class="badge rounded-pill text-bg-success">Pending</span>`;
-			actions = `<a class="btn btn-primary" href="#" role="button">Join</a>`;
+			actions = `<a class="btn btn-primary" href="/classes/${content[i].id}/join" role="button">Join</a> `;
 		} else {
 			status = `<span class="badge rounded-pill text-bg-danger">Finished</span>`;
 			actions = `<button type="button" class="btn btn-outline-danger">Closed</button>`;
@@ -39,3 +39,10 @@ async function loadIntoTable(url) {
 }
 
 loadIntoTable("http://localhost:3000/api/v1/classes");
+
+const myModal = document.getElementById("myModal");
+const myInput = document.getElementById("myInput");
+
+myModal.addEventListener("shown.bs.modal", () => {
+	myInput.focus();
+});

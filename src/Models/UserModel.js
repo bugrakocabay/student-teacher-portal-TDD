@@ -72,8 +72,14 @@ User.init(
 	},
 	{ sequelize, modelName: "user", timestamps: true }
 );
+
+// One-to-many between User-Token and User-Class(for teachers)
 User.hasMany(Token, { onDelete: "cascade", foreignKey: "userId" });
 User.hasMany(Class, { onDelete: "cascade", foreignKey: "userId" });
+
+// Many-to-many between User-Class(for students)
+User.belongsToMany(Class, { through: "StudentClass" });
+Class.belongsToMany(User, { through: "StudentClass" });
 
 sequelize.sync();
 

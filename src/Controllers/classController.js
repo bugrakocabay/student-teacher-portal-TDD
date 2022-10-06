@@ -1,6 +1,7 @@
 const AppError = require("../utils/appError");
 const Class = require("../Models/ClassModel");
 const User = require("../Models/UserModel");
+const StudentClass = require("../Models/StudentClass");
 
 /*
  * Check if user is authenticated >> find authenticated users info in db >> if user is a "student" return Unauthorized,
@@ -195,13 +196,38 @@ exports.updateClass = async (req, res, next) => {
 	}
 };
 
+exports.joinClass = async (req, res, next) => {
+	try {
+		if (!req.authenticatedUser) return next(new AppError("Unauthorized", 401));
+		if (req.userRole === "teacher")
+			return next(new AppError("Teachers can't join classes", 403));
+		let oldClass = await Class.findOne({ where: { id: req.params.id } });
+
+		let newJoin = await StudentClass.create({
+			userId: req.authenticatedUser.id,
+			classId: req.params.id,
+			class_name: oldClass.class_name,
+			date: oldClass.date,
+			teacher: oldClass.teacher,
+			status: oldClass.status,
+			description: oldClass.description,
+		});
+
+		res.send(newJoin);
+	} catch (error) {
+		console.log("JOIN CLASS ERROR " + error);
+		next(error);
+	}
+};
+
 /*const makeClass = async (num) => {
 	for (i = 0; i < num; i++) {
 		await Class.create({
 			class_name: `class${i + 1}`,
 			date: "2022-03-01 10:00:00",
 			teacher: `teacher${i + 1}`,
-			status: "finished",
+			status: "pending",
+			description: "this class is easy",
 		});
 	}
 };

@@ -15,5 +15,6 @@ router
 	.get(userController.getSingleUser)
 	.put(tokenAuth, userController.updateUser)
 	.delete(tokenAuth, userController.deleteUser);
+router.route("/:id/classes").get(tokenAuth, userController.getStudentsClasses);
 
 module.exports = router;

@@ -11,4 +11,6 @@ router
 	.put(tokenAuth, classController.updateClass)
 	.get(tokenAuth, classController.getSingleClass);
 
+router.route("/:id/join").get(tokenAuth, classController.joinClass);
+
 module.exports = router;
