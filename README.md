@@ -17,7 +17,7 @@ Technologies used for this project are;
 
 The test coverage of this project is above %85.
 
-![Logo](https://imgur.com/kQRgZxQ.png)
+<img src="https://imgur.com/kQRgZxQ.png" width="600">
 
 ## Getting Started
 
